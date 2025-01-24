@@ -1,16 +1,9 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Header
 from typing import Union
 
 app = FastAPI()
 
-#C言語でいう構造体のようなもの
-class Item(BaseModel):
-    name: str
-    price: float
-    description: Union[str, None] = None    #Unionは複数の型を宣言することができる
-
-@app.post("/items/")
-def create_item(item: Item):
-    print(f"データを登録します： {item.name}, {item.price}, {item.description}")
-    return item
+@app.get("/sample/")
+def read_sample(authorization: Union[str, None] = Header(default=None)):
+    print(authorization)
+    return {"message": "ヘッダー情報を取得しました"}
