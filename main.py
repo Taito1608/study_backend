@@ -1,12 +1,16 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
 from typing import Union
-from typing import Annotated    #クエリパラメータの最小値と最大値を設定するため（大量のデータを一度に取得しようとするとサービスの遅延に繋がるため）
 
-from fastapi import FastAPI, Query
-
-#クエリパラメータはクライアントからの要求状況をリクエストに含めるために使用する
 app = FastAPI()
-items = ["item1", "item2", "item3", "item4"]
 
-@app.get("/items")
-def read_item(skip: int = 0, limit: Annotated[int, Query(ge=1, le=10)] = 10):   #引数の型とデフォルト引数、クエリパラメータの最小値と最大値を設定する。
-    return {"items": items[skip: skip + limit]}
+#C言語でいう構造体のようなもの
+class Item(BaseModel):
+    name: str
+    price: float
+    description: Union[str, None] = None    #Unionは複数の型を宣言することができる
+
+@app.post("/items/")
+def create_item(item: Item):
+    print(f"データを登録します： {item.name}, {item.price}, {item.description}")
+    return item
