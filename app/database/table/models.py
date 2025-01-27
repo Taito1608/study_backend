@@ -5,7 +5,6 @@ from app.database.setting import Engine
 from app.database.setting import Base
 
 class Todo(Base):
-
     __tablename__ = 'todo'
     __table_args__ = {
         'comment': 'todoの内容を管理するテーブル'
@@ -18,7 +17,6 @@ class Todo(Base):
     settings = relationship("Set", back_populates="todo")
 
 class Tag(Base):
-
     __tablename__ = 'tag'
     __table_args__ = {
         'comment': 'tagの内容を管理するテーブル'
@@ -29,7 +27,6 @@ class Tag(Base):
     settings = relationship("Set", back_populates="tag")
 
 class Set(Base):
-
     __tablename__ = 'set'
     __table_args__ = {
         'comment': 'todoとtagの関連を設定するテーブル'

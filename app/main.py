@@ -9,15 +9,67 @@ app = FastAPI()
 app.mount(path="/app/static", app=StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
-@app.get("/todo/{todo_id}")
-def read_todo(todo_id: str):
+#ルートページ
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "name": "Taito!"
+        })
+
+#Todo 取得(一覧)
+@app.get("/todo")
+def read_todos():
+    return
+
+#Todo 取得(個別)
+@app.get("/todo/{todo_id}", response_class=HTMLResponse)
+def read_todo(todo_id: str, request: Request):
     db = SessionLocal()
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     print(f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}")
-    return {f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}"}
+    return templates.TemplateResponse("index.html", {
+            "request": request,
+            "name": {f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}"}
+            })
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "message": "Hello, FastAPI!"})
+#Todo 作成
+@app.post("/todo")
+def create_todo():
+    return
 
+#Todo 更新
+@app.put("/todo/{todo_id}")
+def update_todo():
+    return
+
+#Todo 削除
+@app.delete("/todo/{todo_id}")
+def delete_todo():
+    return
+
+#Tag 取得(一覧)
+@app.get("/tag")
+def read_tags():
+    return
+
+#Tag 取得(個別)
+@app.get("/tag/{tag_id}")
+def read_tag():
+    return
+
+#Tag 作成
+@app.post("/tag")
+def create_tag():
+    return
+
+#Tag 更新
+@app.put("/tag/{tag_id}")
+def update_tag():
+    return
+
+#Tag 削除
+@app.delete("/tag/{tag_id}")
+def delete_tag():
+    return
 
