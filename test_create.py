@@ -1,7 +1,7 @@
 from app.database.setting import SessionLocal
 from app.database.table.models import Todo
 
-def test_insert():
+def create_test():
     db = SessionLocal()
     new_record = Todo(box="Hello, World!", date="2025-01-27", done=False)
     db.add(new_record)
@@ -10,4 +10,4 @@ def test_insert():
     print(f"挿入したレコード: {new_record.id}, {new_record.box}, {new_record.date}, {new_record.done}")
 
 if __name__ == "__main__":
-    test_insert()
+    create_test()
