@@ -1,5 +1,5 @@
-from app.database.setting import SessionLocal
-from app.database.table.models import Todo
+from database.setting import SessionLocal
+from database.table.models import Todo
 
 def create_test():
     db = SessionLocal()
