@@ -1,7 +1,9 @@
 from app.database.setting import Engine, Base
+from app.database.table.set import Set
+from app.database.table.tag import Tag
 from app.database.table.todo import Todo
 
-# テーブルを作成
+# 一度に全てのテーブルを作成できるようにする
 def create_tables():
     Base.metadata.create_all(bind=Engine)
 
