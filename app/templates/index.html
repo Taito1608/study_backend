@@ -15,6 +15,11 @@
                       Hello! {{ name }}
                     {% endblock %}
                 </div>
+                <ul>
+                    {% for item in items %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
             </div>
             <br>
             <hr>
