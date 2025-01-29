@@ -5,7 +5,9 @@ from fastapi.templating import Jinja2Templates
 from .database.setting import SessionLocal
 from .database.table.models import Todo
 
-app = FastAPI()
+app = FastAPI(
+    title='FastAPIでつくるtoDoアプリケーション',
+)
 app.mount(path="/app/static", app=StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
@@ -16,6 +18,14 @@ async def read_root(request: Request):
         "request": request,
         "name": "Taito!"
         })
+
+#test（データ取得確認）
+@app.get("/test")
+def test_res():
+    db = SessionLocal()
+    todo = db.query(Todo).filter(Todo.id == "1").first()
+    db.close()
+    return {f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}"}
 
 #Todo 取得(一覧)
 @app.get("/todo")

@@ -3,9 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastAPI Template Example</title>
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="app/static/css/styles.css">
 </head>
 <body>
-    <h1>Hello {{ name }}</h1>
+    <div class="background">
+        <h1>TODOLIST</h1>
+            <div style="display: flex; flex-direction: column; min-height: 80vh">
+                <div class="container">
+                    {% block content %}
+                      Hello! {{ name }}
+                    {% endblock %}
+                </div>
+            </div>
+            <br>
+            <hr>
+    </div>
+    
 </body>
 </html>
