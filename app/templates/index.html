@@ -16,17 +16,10 @@
                     {% endblock %}
                 </div>
                 <ul>
-                    {% for item in items %}
+                    {% for item in todo_list %}
                         <li>{{ item }}</li>
                     {% endfor %}
                 </ul>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ item }}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
             </div>
             <br>
             <hr>

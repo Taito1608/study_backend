@@ -11,6 +11,8 @@ app = FastAPI(
 app.mount(path="/app/static", app=StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
+db = SessionLocal()
+
 #ルートページ
 @app.get("/aaaa", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -24,15 +26,18 @@ async def read_root(request: Request):
 #テスト
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    db = SessionLocal()
-    todo = db.query(Todo).filter(Todo.id == "1").first()
+    todos = db.query(Todo).all()
+    todo_list = []
     db.close()
-    items = [todo.id,todo.box, todo.date, todo.done]
-    
+
+    for todo in todos:
+        todo_list.append(todo.box)
+        print(todo_list)
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "name": "Taito!",
-        "items": items
+        "todo_list": todo_list
         })
 
 #Todo 取得(一覧)
