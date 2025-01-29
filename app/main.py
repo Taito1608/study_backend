@@ -12,7 +12,7 @@ app.mount(path="/app/static", app=StaticFiles(directory="app/static"), name="sta
 templates = Jinja2Templates(directory="app/templates")
 
 #ルートページ
-@app.get("/", response_class=HTMLResponse)
+@app.get("/aaaa", response_class=HTMLResponse)
 async def read_root(request: Request):
     items = ("bread","milk","apple")
     return templates.TemplateResponse("index.html", {
@@ -21,23 +21,18 @@ async def read_root(request: Request):
         "items": items
         })
 
-#test（データ取得確認）
-@app.get("/test")
-def test_res():
+#テスト
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
     db = SessionLocal()
     todo = db.query(Todo).filter(Todo.id == "1").first()
     db.close()
-    return {f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}"}
-
-#リスト表示確認
-@app.get("/test/1")
-async def test_list(request: Request):
-    db = SessionLocal()
-    todo = db.query(Todo).filter(Todo.id == "1").first()
-    db.close()
-    return templates.TemplateResponse("test.html", {
+    items = [todo.id,todo.box, todo.date, todo.done]
+    
+    return templates.TemplateResponse("index.html", {
         "request": request,
-        
+        "name": "Taito!",
+        "items": items
         })
 
 #Todo 取得(一覧)
