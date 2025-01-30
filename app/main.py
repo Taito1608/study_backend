@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse,RedirectResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .database.setting import SessionLocal
-from .database.table.models import Todo, Tag
+from .database.table.models import Todo, Tag, Set
 from urllib.parse import urljoin
 
 app = FastAPI(
@@ -57,11 +57,19 @@ def create_todo(
     
     print(f"ToDo: {box}, タグID: {tag_id}")
     
+    #todoのレコード作成
     new_record = Todo(box=box, completed=False)
     db.add(new_record)
     db.commit()
     db.refresh(new_record)
+
+    #Setのレコード作成
+    new_set = Set(todo_id=new_record.id, tag_id=tag_id)
+    db.add(new_set)
+    db.commit()
+    db.refresh(new_set)
     print(f"挿入したレコード: {new_record.id}, {new_record.box}, {new_record.date}, {new_record.completed}")
+    print(f"SETに挿入したレコード: {new_set.id}, {new_set.todo}, {new_set.tag}")
     # 追加後にリダイレクトして、最新のToDoリストを表示する
     return RedirectResponse(url="/todo", status_code=303)
 
@@ -72,12 +80,12 @@ def update_todo():
 
 #Todo 削除
 @app.delete("/todo/{todo_id}")
-def delete_todo(todo_id: int):
+def delete_todo(todo_id):
     todo_item = db.query(Todo).filter(Todo.id == todo_id).first()
-    
+
     if not todo_item:
         return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
-    
+
     db.delete(todo_item)
     db.commit()
 
@@ -108,4 +116,3 @@ def update_tag():
 @app.delete("/tag/{tag_id}")
 def delete_tag():
     return
-
