@@ -122,3 +122,80 @@ li input[type="checkbox"] {
 #removeCheckedBtn:hover {
     background: #27ae60;
 }
+
+/*完了時の横線*/
+.completed {
+    text-decoration: line-through;
+    color: #000;
+}
+
+/* リストアイテムのデザイン */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* タスク名を左寄せ、日付と状態を右寄せ */
+.task-content {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.task-meta {
+    text-align: right;
+    min-width: 80px; /* 適宜調整 */
+    color: #165e83;
+}
+
+/* 戻るボタンのデザイン */
+.back-button {
+    position: fixed;
+    bottom: 20px;
+    left: 15px;
+    width: 40px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ホバー時の効果 */
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+/*新規作成ボタン*/
+.new-create {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 40px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}

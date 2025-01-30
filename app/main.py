@@ -3,7 +3,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .database.setting import SessionLocal
-from .database.table.models import Todo
+from .database.table.models import Todo, Tag
+from urllib.parse import urljoin
 
 app = FastAPI(
     title='FastAPIでつくるtoDoアプリケーション',
@@ -26,35 +27,33 @@ async def read_root(request: Request):
 #テスト
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    todos = db.query(Todo).all()
-    todo_list = []
+    tag_list = db.query(Tag).all()
+    todo_list = db.query(Todo).all()      
     db.close()
-
-    for todo in todos:
-        todo_list.append(todo.box)
-        print(todo_list)
-
-    return templates.TemplateResponse("index.html", {
+    
+    return templates.TemplateResponse("todolist_get.html", {
         "request": request,
         "name": "Taito!",
-        "todo_list": todo_list
+        "todo_list": todo_list,
+        "tag_list": tag_list
         })
 
 #Todo 取得(一覧)
 @app.get("/todo")
-def read_todos():
+def read_todolist():
     return
 
 #Todo 取得(個別)
 @app.get("/todo/{todo_id}", response_class=HTMLResponse)
-def read_todo(todo_id: str, request: Request):
-    db = SessionLocal()
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
-    print(f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}")
-    return templates.TemplateResponse("index.html", {
-            "request": request,
-            "name": {f"読み込んだレコード: {todo.id}, {todo.box}, {todo.date}, {todo.done}"}
-            })
+async def read_todo(request: Request, todo_id):
+  todo = db.query(Todo).filter(Todo.id == todo_id).first()
+
+
+  return templates.TemplateResponse("todo_get.html", {
+        "request": request,
+        "name": "Taito!",
+        "todo_list": todo.box
+        })
 
 #Todo 作成
 @app.post("/todo")

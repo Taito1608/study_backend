@@ -1,0 +1,30 @@
+{%- extends "layout.html" %}
+{%- block content %}
+
+    <!-- Todo入力フォーム -->
+    <form id="todo-form">
+        <input type="text" id="todo-input" placeholder="ToDoを入力,タグを選択してください" required>
+        
+        <!-- タグの選択 -->
+        <select id="tag-select">
+            {% for tag in tag_list %}
+                <option value="{{ tag.id }}">{{ tag.desc }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">追加</button>
+    </form>
+
+    <!-- ToDo リスト -->
+    <ul>
+        {% for item in todo_list %}
+        <li class="{% if item.completed %}completed{% endif %}">
+            <a href="https://235tb4t2-8000.asse.devtunnels.ms/todo/{{ item.id }}" style="color: black; display: flex; justify-content: space-between; width: 100%;">
+                <span class="task-content"><strong>{{ item.box }}</strong></span>
+                <span class="task-meta">{{ item.date }} - {{ '済' if item.completed else '未' }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+{%- endblock %}

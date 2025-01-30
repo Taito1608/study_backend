@@ -1,8 +1,8 @@
 """create_tables
 
-Revision ID: be9a036f7583
+Revision ID: 607d4ac05516
 Revises: 
-Create Date: 2025-01-29 10:44:23.253453
+Create Date: 2025-01-30 11:18:25.378149
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'be9a036f7583'
+revision: str = '607d4ac05516'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,8 +29,8 @@ def upgrade() -> None:
     op.create_table('todo',
     sa.Column('todo_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('box', sa.String(length=200), nullable=False),
-    sa.Column('date', sa.String(length=200), nullable=False),
-    sa.Column('done', sa.Boolean(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=True),
+    sa.Column('completed', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('todo_id'),
     comment='todoの内容を管理するテーブル'
     )
