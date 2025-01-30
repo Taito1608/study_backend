@@ -4,9 +4,40 @@
     <ul>
         {{ tag_list }}
     </ul>
+    <button onclick="updateTag('{{ tag_id }}')" class="add-button">
+        更新（まだ未実装）
+    </button>
     <button type="button" class="back-button" onclick="history.back()">
         戻る
     </button>
+
+    <script>
+        async function updateTag(tagId) {
+            if (!confirm("本当に更新しますか？")) {
+                return;
+            }
+    
+            try {
+                const response = await fetch(`/tag/${tagId}`, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+    
+                if (response.ok) {
+                    alert("Tagを更新しました");
+                    location.reload();  // ページをリロードして最新のToDoリストを表示
+                } else {
+                    const data = await response.json();
+                    alert("更新に失敗しました: " + (data.message || "不明なエラー"));
+                }
+            } catch (error) {
+                console.error("エラー:", error);
+                alert("エラーが発生しました");
+            }
+        }
+    </script>
 
     
 {% endblock %}

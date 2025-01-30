@@ -124,18 +124,50 @@ async def read_tag(request: Request, tag_id):
   return templates.TemplateResponse("tag_get.html", {
         "request": request,
         "name": "Taito!",
-        "tag_list": tag.desc
+        "tag_list": tag.desc,
+        "tag_id": tag_id
         })
 
 #Tag 作成
 @app.post("/tag")
-def create_tag():
-    return
+def create_tab(
+    box: str = Form(...), 
+):
+    
+    print(f"Tag: {box}")
+    
+    #tagのレコード作成
+    new_record = Tag(desc=box)
+    db.add(new_record)
+    db.commit()
+    db.refresh(new_record)
+
+    print(f"挿入したレコード: {new_record.id}, {new_record.box}, {new_record.date}, {new_record.completed}")
+    # 追加後にリダイレクトして、最新のTagリストを表示する
+    return RedirectResponse(url="/tag", status_code=303)
 
 #Tag 更新
 @app.put("/tag/{tag_id}")
-def update_tag():
+def update_tag(tag_id):
+    #
+    update = db.query(Todo).filter(Todo.id == "3").first()
     return
+
+def delete_todo(todo_id: int):
+    # 指定されたToDoを取得
+    todo_item = db.query(Todo).filter(Todo.id == todo_id).first()
+    
+    if not todo_item:
+        return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
+
+    # 関連するSetテーブルのレコードを削除
+    db.query(Set).filter(Set.todo_id == todo_id).delete()
+    
+    # Todo自体を削除
+    db.delete(todo_item)
+    db.commit()
+
+    return JSONResponse(status_code=200, content={"message": "ToDoが削除されました"})
 
 #Tag 削除
 @app.delete("/tag/{tag_id}")

@@ -1,7 +1,13 @@
 {%- extends "layout.html" %}
 {%- block content %}
-    <!-- ToDo リスト -->
+    <!-- Tag入力フォーム -->
+    <form id="tag-form" class="tag-form" method="POST" action="/tag">
+        <input type="text" id="todo-input" class="tag-input" placeholder="Tagを入力" name="box" required>
+        <button type="submit" class="add-button">追加</button>
+    </form>
+    <br>
 
+<!-- Tag リスト -->
     <table style="border-collapse: separate; border-spacing: 0;">
         <thead>
             <tr>
