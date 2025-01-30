@@ -80,12 +80,17 @@ def update_todo():
 
 #Todo 削除
 @app.delete("/todo/{todo_id}")
-def delete_todo(todo_id):
+def delete_todo(todo_id: int):
+    # 指定されたToDoを取得
     todo_item = db.query(Todo).filter(Todo.id == todo_id).first()
-
+    
     if not todo_item:
         return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
 
+    # 関連するSetテーブルのレコードを削除
+    db.query(Set).filter(Set.todo_id == todo_id).delete()
+    
+    # Todo自体を削除
     db.delete(todo_item)
     db.commit()
 
