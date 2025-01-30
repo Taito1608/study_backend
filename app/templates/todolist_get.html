@@ -14,25 +14,82 @@
         
         <button type="submit" class="add-button">追加</button>
     </form>
-
-    <!-- ToDo リスト -->
-    <ul>
-        {% for item in todo_list %}
-        <li class="{% if item.completed %}completed{% endif %}">
-            <a href="https://235tb4t2-8000.asse.devtunnels.ms/todo/{{ item.id }}" style="color: black; display: flex; justify-content: space-between; width: 100%;">
-                <span class="task-content"><strong>{{ item.box }}</strong></span>
-                <span class="task-meta">{{ item.date }} - {{ '済' if item.completed else '未' }}</span>
-            </a>
-            <!-- 削除ボタン -->
-            <button onclick="deleteTodo('{{ item.id }}')"
-                class="add-button" 
-                >
-            削除
-            </button>
-        </li>
-        {% endfor %}
-    </ul>
     
+    <!-- ToDo リスト -->
+    
+
+    <table style="border-collapse: separate; border-spacing: 0;">
+        <thead>
+            <tr>
+                <th>内容</th>
+                <th>期限</th>
+                <th>完了</th>
+                <th>タグ</th>
+                <th>削除</th>
+            </tr>
+        </thead>
+        <tbody id="todo-list">
+            {% for item in todo_list %}
+            <tr>
+                <td>
+                    <a href="/todo/{{ item.id }}" style="color: black; text-decoration: none;">
+                        {{ item.box }}
+                    </a>
+                </td>
+                <td>{{ item.date if item.date else 'なし' }}</td>
+                <td>{{ '完了' if item.completed else '未完了' }}</td>
+                <td></td>
+                <td>
+                    <button onclick="deleteTodo('{{ item.id }}')" class="add-button">
+                        削除
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button type="button" class="back-button" onclick="history.back()">
+        戻る
+    </button>
+    
+    <style>
+        /* テーブルのスタイル */
+        table {
+            width: 100%;
+            border-spacing: 0; /* セル間に隙間を作らない */
+        }
+    
+        /* 偶数行の背景色 */
+        #todo-list tr:nth-child(even) {
+            background-color: #f4f4f4; /* 例えば薄いグレー */
+        }
+    
+        /* 奇数行の背景色 */
+        #todo-list tr:nth-child(odd) {
+            background-color: #ffffff; /* 白 */
+        }
+    
+        /* ホバー時に背景色を変更 */
+        #todo-list tr:hover {
+            background-color: #e0e0e0; /* ホバー時の背景色 */
+        }
+    
+        /* 行ごとに下線を引く */
+        #todo-list tr {
+            border-bottom: 1px solid #ccc; /* 行の下に薄い灰色の線を引く */
+        }
+    
+        /* 最後の行のボーダーを削除 */
+        #todo-list tr:last-child {
+            border-bottom: none;
+        }
+    
+        /* セル内の余白を追加 */
+        td {
+            padding: 10px; /* セルの内側に余白を作成 */
+        }
+    </style>
 
     <script>
         async function deleteTodo(todoId) {

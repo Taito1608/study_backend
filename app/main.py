@@ -26,14 +26,16 @@ async def root_page(request: Request):
 @app.get("/todo")
 async def read_todolist(request: Request):
     tag_list = db.query(Tag).all()
-    todo_list = db.query(Todo).all()      
+    todo_list = db.query(Todo).all()   
+    set_list = db.query(Set).all   
     db.close()
     
     return templates.TemplateResponse("todolist_get.html", {
         "request": request,
         "name": "Taito!",
         "todo_list": todo_list,
-        "tag_list": tag_list
+        "tag_list": tag_list,
+        "set_list": set_list
         })
 
 #Todo 取得(個別)
@@ -99,13 +101,31 @@ def delete_todo(todo_id: int):
 
 #Tag 取得(一覧)
 @app.get("/tag")
-def read_tags():
-    return
+async def read_tags(request: Request):
+    tag_list = db.query(Tag).all()
+    todo_list = db.query(Todo).all()   
+    set_list = db.query(Set).all   
+    db.close()
+    
+    return templates.TemplateResponse("taglist_get.html", {
+        "request": request,
+        "name": "Taito!",
+        "todo_list": todo_list,
+        "tag_list": tag_list,
+        "set_list": set_list
+        })
 
 #Tag 取得(個別)
 @app.get("/tag/{tag_id}")
-def read_tag():
-    return
+async def read_tag(request: Request, tag_id):
+  tag = db.query(Tag).filter(Tag.id == tag_id).first()
+
+
+  return templates.TemplateResponse("tag_get.html", {
+        "request": request,
+        "name": "Taito!",
+        "tag_list": tag.desc
+        })
 
 #Tag 作成
 @app.post("/tag")
