@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
+    <br>
     <table style="border-collapse: separate; border-spacing: 0;">
         <thead>
             <tr>
@@ -8,7 +9,6 @@
                 <th>期限</th>
                 <th>完了</th>
                 <th>タグ</th>
-                <th>削除</th>
             </tr>
         </thead>
         <tbody id="todo">
@@ -17,11 +17,6 @@
                 <td>{{ todo.date if todo.date else 'なし' }}</td>
                 <td>{{ '完了' if todo.completed else '未完了' }}</td>
                 <td></td>
-                <td>
-                    <button onclick="deleteTodo('{{ todo.id }}')" class="add-button">
-                        削除
-                    </button>
-                </td>
             </tr>
         </tbody>
     </table>
@@ -31,7 +26,7 @@
         <input type="date" id="update-tododate" name="tododate" required value="{{ todo.date }}">
         <label>
             <input type="checkbox" id="update-todocompleted" name="todocomp" value="True" {% if todo.completed %}checked{% endif %}>
-            完了
+            <strong>完了</strong>
         </label>
         
         <select id="tag-select" class="tag-updateselect" name="tag_id">
@@ -68,7 +63,7 @@
         label {
             display: flex;
             align-items: center;
-            gap: 5px; /* チェックボックスとテキストの間隔 */
+            gap: 1px; /* チェックボックスとテキストの間隔 */
         }
     </style>
 

@@ -31,7 +31,7 @@ async def read_todolist(request: Request):
     set_list = db.query(Set).all   
     db.close()
     
-    return templates.TemplateResponse("todolist_get.html", {
+    return templates.TemplateResponse("todolist.html", {
         "request": request,
         "name": "Taito!",
         "todo_list": todo_list,
@@ -46,7 +46,7 @@ async def read_todo(request: Request, todo_id):
   tag_list = db.query(Tag).all()
 
 
-  return templates.TemplateResponse("todo_get.html", {
+  return templates.TemplateResponse("todo.html", {
         "request": request,
         "name": "Taito!",
         "todo": todo,
