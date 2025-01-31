@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from .database.setting import SessionLocal
 from .database.table.models import Todo, Tag, Set
 from urllib.parse import urljoin
+from datetime import datetime
 
 app = FastAPI(
     title='FastAPIでつくるtoDoアプリケーション',
@@ -81,8 +82,33 @@ def create_todo(
 @app.put("/todo/{todo_id}")
 async def update_todo(todo_id: int, request:Request):
     data = await request.json()
-    print(data)
-    return
+    #それぞれのデータを取り出す
+    todobox = data.get("todobox")    
+    todocomp = data.get("todocomp")  
+    tag_id = data.get("tag_id") 
+
+    date_str = data.get("tododate")
+    if date_str:
+        # 日付文字列をdatetimeオブジェクトに変換
+        tododate = datetime.strptime(date_str, "%Y-%m-%d").date()  # "%Y-%m-%d"形式の文字列をdatetime.dateに変換
+    else:
+        tododate = None
+
+    todo_update = db.query(Todo).filter(Todo.id == todo_id).first()
+    tag_update = db.query(Set).filter(Set.tag_id == tag_id).first()
+
+    if not todo_update:
+        return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
+    
+    todo_update.box = todobox
+    todo_update.date = tododate
+    todo_update.completed = todocomp
+
+    db.commit()
+
+    # 取り出したデータを表示
+    print(f"ToDo: {todobox}, 日付: {tododate}, 完了: {todocomp}, タグID: {tag_id}")
+    return JSONResponse(status_code=200, content={"message": "ToDoが更新されました"})
 
 #Todo 削除
 @app.delete("/todo/{todo_id}")

@@ -16,8 +16,6 @@
     </form>
     
     <!-- ToDo リスト -->
-    
-
     <table style="border-collapse: separate; border-spacing: 0;">
         <thead>
             <tr>
@@ -52,71 +50,5 @@
     <button type="button" class="back-button" onclick="history.back()">
         戻る
     </button>
-    
-    <style>
-        /* テーブルのスタイル */
-        table {
-            width: 100%;
-            border-spacing: 0; /* セル間に隙間を作らない */
-        }
-    
-        /* 偶数行の背景色 */
-        #todo-list tr:nth-child(even) {
-            background-color: #f4f4f4; /* 例えば薄いグレー */
-        }
-    
-        /* 奇数行の背景色 */
-        #todo-list tr:nth-child(odd) {
-            background-color: #ffffff; /* 白 */
-        }
-    
-        /* ホバー時に背景色を変更 */
-        #todo-list tr:hover {
-            background-color: #e0e0e0; /* ホバー時の背景色 */
-        }
-    
-        /* 行ごとに下線を引く */
-        #todo-list tr {
-            border-bottom: 1px solid #ccc; /* 行の下に薄い灰色の線を引く */
-        }
-    
-        /* 最後の行のボーダーを削除 */
-        #todo-list tr:last-child {
-            border-bottom: none;
-        }
-    
-        /* セル内の余白を追加 */
-        td {
-            padding: 10px; /* セルの内側に余白を作成 */
-        }
-    </style>
-
-    <script>
-        async function deleteTodo(todoId) {
-            if (!confirm("本当に削除しますか？")) {
-                return;
-            }
-    
-            try {
-                const response = await fetch(`/todo/${todoId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-    
-                if (response.ok) {
-                    alert("ToDoを削除しました");
-                    location.reload();  // ページをリロードして最新のToDoリストを表示
-                } else {
-                    const data = await response.json();
-                    alert("削除に失敗しました: " + (data.message || "不明なエラー"));
-                }
-            } catch (error) {
-                console.error("エラー:", error);
-                alert("エラーが発生しました");
-            }
-        }
-    </script>
 
 {%- endblock %}

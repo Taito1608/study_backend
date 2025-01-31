@@ -26,15 +26,15 @@
         </tbody>
     </table>
 
-    <form id="todo-updateform" class="todo-form" data-todo-id="{{ todo.id }}">
-        <input type="text" id="update-todobox" class="todo-input" placeholder="ToDoを入力" name="todobox" required value="{{ todo.box }}">
+    <form id="todo-updateform" class="todo-updateform" data-todo-id="{{ todo.id }}">
+        <input type="text" id="update-todobox" class="todo-updateinput" placeholder="ToDoを入力" name="todobox" required value="{{ todo.box }}">
         <input type="date" id="update-tododate" name="tododate" required value="{{ todo.date }}">
         <label>
             <input type="checkbox" id="update-todocompleted" name="todocomp" value="True" {% if todo.completed %}checked{% endif %}>
             完了
         </label>
         
-        <select id="tag-select" class="tag-select" name="tag_id">
+        <select id="tag-select" class="tag-updateselect" name="tag_id">
             {% for tag in tag_list %}
                 <option value="{{ tag.id }}" {% if tag.id == todo.tag_id %}selected{% endif %}>{{ tag.desc }}</option>
             {% endfor %}
@@ -46,32 +46,34 @@
     <button type="button" class="back-button" onclick="history.back()">戻る</button>
 
     <style>
-    .todo-form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px; /* 各要素の間隔を調整 */
-        width: 100%;
-        max-width: 400px; /* フォームの最大幅を制限 */
-        margin: auto; /* 中央配置 */
-    }
-    
-    .todo-input,
-    #update-tododate,
-    .tag-select,
-    .add-button {
-        width: 100%; /* 幅を揃える */
-        padding: 8px;
-        font-size: 16px;
-    }
-    
-    label {
-        display: flex;
-        align-items: center;
-        gap: 5px; /* チェックボックスとテキストの間隔 */
-    }
+        /* Todo更新画面*/
+        .todo-updateform {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 各要素の間隔を調整 */
+            width: 100%;
+            max-width: 400px; /* フォームの最大幅を制限 */
+            margin: auto; /* 中央配置 */
+        }
+
+        .todo-updateinput,
+        #update-tododate,
+        .tag-updateselect,
+        .add-button {
+            width: 100%; /* 幅を揃える */
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 5px; /* チェックボックスとテキストの間隔 */
+        }
     </style>
 
     <script>
+        //Todoの更新
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("todo-updateform");
             if (!form) {
