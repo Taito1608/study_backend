@@ -125,6 +125,7 @@ def delete_todo(todo_id: int):
     # Todo自体を削除
     db.delete(todo_item)
     db.commit()
+    
 
     return JSONResponse(status_code=200, content={"message": "ToDoが削除されました"})
     
@@ -172,7 +173,7 @@ def create_tab(
     db.commit()
     db.refresh(new_record)
 
-    print(f"挿入したレコード: {new_record.id}, {new_record.box}, {new_record.date}, {new_record.completed}")
+    print(f"挿入したレコード: {new_record.id}, {new_record.desc}")
     # 追加後にリダイレクトして、最新のTagリストを表示する
     return RedirectResponse(url="/tag", status_code=303)
 
@@ -201,5 +202,18 @@ def delete_todo(todo_id: int):
 
 #Tag 削除
 @app.delete("/tag/{tag_id}")
-def delete_tag():
-    return
+def delete_tag(tag_id: int):
+    # 指定されたTagを取得
+    tag_item = db.query(Tag).filter(Tag.id == tag_id).first()
+
+    if not tag_item:
+        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
+
+    # 関連するSetテーブルのレコードを削除
+    db.query(Set).filter(Set.tag_id == tag_id).delete()
+
+    # Tag自体を削除
+    db.delete(tag_item)
+    db.commit()
+
+    return JSONResponse(status_code=200, content={"message": "Tagが削除されました"})

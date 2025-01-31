@@ -15,7 +15,7 @@ class Todo(Base):
     box  = Column('box', String(200), nullable=False)
     date = Column('date', DateTime, nullable=True)  # 現在時刻をデフォルトに設定
     completed = Column('completed', Boolean, default=False)
-    settings = relationship("Set", back_populates="todo")
+    settings = relationship("Set", back_populates="todo", cascade="all, delete-orphan")
 
 class Tag(Base):
     __tablename__ = 'tag'
@@ -25,7 +25,7 @@ class Tag(Base):
 
     id   = Column('tag_id', Integer, primary_key=True, autoincrement=True)
     desc = Column('description', String(200), nullable=False)
-    settings = relationship("Set", back_populates="tag")
+    settings = relationship("Set", back_populates="tag", cascade="all, delete-orphan")
 
 class Set(Base):
     __tablename__ = 'set'
@@ -34,8 +34,8 @@ class Set(Base):
     }
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    todo_id = Column(Integer, ForeignKey('todo.todo_id'), nullable=False)
-    tag_id = Column(Integer, ForeignKey('tag.tag_id'), nullable=False)
+    todo_id = Column(Integer, ForeignKey('todo.todo_id', ondelete='CASCADE'), nullable=False)
+    tag_id = Column(Integer, ForeignKey('tag.tag_id', ondelete='CASCADE'), nullable=False)
 
     todo = relationship("Todo", back_populates="settings")
     tag = relationship("Tag", back_populates="settings")

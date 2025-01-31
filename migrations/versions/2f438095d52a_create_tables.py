@@ -1,8 +1,8 @@
 """create_tables
 
-Revision ID: 607d4ac05516
+Revision ID: 2f438095d52a
 Revises: 
-Create Date: 2025-01-30 11:18:25.378149
+Create Date: 2025-01-31 16:54:05.383165
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '607d4ac05516'
+revision: str = '2f438095d52a'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,8 +38,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('todo_id', sa.Integer(), nullable=False),
     sa.Column('tag_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['tag_id'], ['tag.tag_id'], ),
-    sa.ForeignKeyConstraint(['todo_id'], ['todo.todo_id'], ),
+    sa.ForeignKeyConstraint(['tag_id'], ['tag.tag_id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['todo_id'], ['todo.todo_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     comment='todoとtagの関連を設定するテーブル'
     )
