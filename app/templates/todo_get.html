@@ -1,58 +1,124 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    <ul>
-        {{ todo.box }}
-    </ul>
+    <table style="border-collapse: separate; border-spacing: 0;">
+        <thead>
+            <tr>
+                <th>内容</th>
+                <th>期限</th>
+                <th>完了</th>
+                <th>タグ</th>
+                <th>削除</th>
+            </tr>
+        </thead>
+        <tbody id="todo">
+            <tr>
+                <td>{{ todo.box }}</td>
+                <td>{{ todo.date if todo.date else 'なし' }}</td>
+                <td>{{ '完了' if todo.completed else '未完了' }}</td>
+                <td></td>
+                <td>
+                    <button onclick="deleteTodo('{{ todo.id }}')" class="add-button">
+                        削除
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-    <form id="todo-updateform" class="todo-form">
-        <input type="text" id="update-todobox" class="todo-input" placeholder="ToDoを入力" name="box" required>
-        <input type="datetime-local" id="update-tododate" name="due_date" required>
+    <form id="todo-updateform" class="todo-form" data-todo-id="{{ todo.id }}">
+        <input type="text" id="update-todobox" class="todo-input" placeholder="ToDoを入力" name="todobox" required value="{{ todo.box }}">
+        <input type="date" id="update-tododate" name="tododate" required value="{{ todo.date }}">
+        <label>
+            <input type="checkbox" id="update-todocompleted" name="todocomp" value="True" {% if todo.completed %}checked{% endif %}>
+            完了
+        </label>
         
-        <!-- タグの選択 -->
         <select id="tag-select" class="tag-select" name="tag_id">
             {% for tag in tag_list %}
-                <option value="{{ tag.id }}">{{ tag.desc }}</option>
+                <option value="{{ tag.id }}" {% if tag.id == todo.tag_id %}selected{% endif %}>{{ tag.desc }}</option>
             {% endfor %}
         </select>
         
         <button type="submit" class="add-button">追加</button>
     </form>
 
-    <button onclick="updateTodo('{{ todo.id }}')" class="add-button">
-        更新（未実装）
-    </button>
-    <button type="button" class="back-button" onclick="history.back()">
-        戻る
-    </button>
+    <button type="button" class="back-button" onclick="history.back()">戻る</button>
+
+    <style>
+    .todo-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* 各要素の間隔を調整 */
+        width: 100%;
+        max-width: 400px; /* フォームの最大幅を制限 */
+        margin: auto; /* 中央配置 */
+    }
+    
+    .todo-input,
+    #update-tododate,
+    .tag-select,
+    .add-button {
+        width: 100%; /* 幅を揃える */
+        padding: 8px;
+        font-size: 16px;
+    }
+    
+    label {
+        display: flex;
+        align-items: center;
+        gap: 5px; /* チェックボックスとテキストの間隔 */
+    }
+    </style>
 
     <script>
-        async function updateTodo(todoId) {
-            if (!confirm("本当に更新しますか？")) {
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("todo-updateform");
+            if (!form) {
+                console.error("フォームが見つかりません");
                 return;
             }
-    
-            try {
-                const response = await fetch(`/todo/${todoId}`, {
-                    method: 'PUT',
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-    
-                if (response.ok) {
-                    alert("ToDoを更新しました");
-                    location.reload();  // ページをリロードして最新のToDoリストを表示
-                } else {
-                    const data = await response.json();
-                    alert("更新に失敗しました: " + (data.message || "不明なエラー"));
+
+            const todoId = form.dataset.todoId; // HTML の data-todo-id から取得
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault(); // フォームの通常の送信を防ぐ
+                
+                if (!confirm("本当に更新しますか？")) {
+                    return;
                 }
-            } catch (error) {
-                console.error("エラー:", error);
-                alert("エラーが発生しました");
-            }
-        }
+
+                // フォームのデータを取得
+                const formData = new FormData(form);
+                const data = {
+                    todobox: formData.get("todobox"),
+                    tododate: formData.get("tododate"),
+                    todocomp: !!formData.get("todocomp"), // チェックボックスを boolean に変換
+                    tag_id: formData.get("tag_id")
+                };
+
+                try {
+                    const response = await fetch(`/todo/${todoId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        alert("ToDoを更新しました");
+                        location.reload(); // ページをリロード
+                    } else {
+                        const responseData = await response.json();
+                        alert("更新に失敗しました: " + (responseData.message || "不明なエラー"));
+                    }
+                } catch (error) {
+                    console.error("エラー:", error);
+                    alert("エラーが発生しました");
+                }
+            });
+        });
     </script>
 
-    
 {% endblock %}

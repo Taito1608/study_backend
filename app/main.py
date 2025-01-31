@@ -42,12 +42,14 @@ async def read_todolist(request: Request):
 @app.get("/todo/{todo_id}", response_class=HTMLResponse)
 async def read_todo(request: Request, todo_id):
   todo = db.query(Todo).filter(Todo.id == todo_id).first()
+  tag_list = db.query(Tag).all()
 
 
   return templates.TemplateResponse("todo_get.html", {
         "request": request,
         "name": "Taito!",
-        "todo": todo
+        "todo": todo,
+        "tag_list": tag_list
         })
 
 #Todo 作成
@@ -77,7 +79,9 @@ def create_todo(
 
 #Todo 更新
 @app.put("/todo/{todo_id}")
-def update_todo():
+async def update_todo(todo_id: int, request:Request):
+    data = await request.json()
+    print(data)
     return
 
 #Todo 削除
