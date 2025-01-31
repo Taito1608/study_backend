@@ -155,7 +155,7 @@ async def read_tag(request: Request, tag_id):
   return templates.TemplateResponse("tag_get.html", {
         "request": request,
         "name": "Taito!",
-        "tag_list": tag.desc,
+        "tag": tag,
         "tag_id": tag_id
         })
 
@@ -179,26 +179,26 @@ def create_tab(
 
 #Tag 更新
 @app.put("/tag/{tag_id}")
-def update_tag(tag_id):
-    #
-    update = db.query(Todo).filter(Todo.id == "3").first()
-    return
+async def update_tag(tag_id: int, request: Request):
+    # JSONで送信されたデータを取得
+    data = await request.json()
+    tagdesc = data.get("tagdesc")  # 送信されたtagdescを取得
 
-def delete_todo(todo_id: int):
-    # 指定されたToDoを取得
-    todo_item = db.query(Todo).filter(Todo.id == todo_id).first()
+    # tag_idに対応するTagをデータベースから取得
+    tag_update = db.query(Tag).filter(Tag.id == tag_id).first()
+
+    if not tag_update:
+        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
     
-    if not todo_item:
-        return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
+    # tagdescを更新
+    tag_update.desc = tagdesc
+    db.commit()  # データベースに変更を反映
 
-    # 関連するSetテーブルのレコードを削除
-    db.query(Set).filter(Set.todo_id == todo_id).delete()
+    # 更新されたtagdescを表示
+    print(f"Tag updated to: {tagdesc}")
     
-    # Todo自体を削除
-    db.delete(todo_item)
-    db.commit()
+    return JSONResponse(status_code=200, content={"message": "Tagが更新されました"})
 
-    return JSONResponse(status_code=200, content={"message": "ToDoが削除されました"})
 
 #Tag 削除
 @app.delete("/tag/{tag_id}")
