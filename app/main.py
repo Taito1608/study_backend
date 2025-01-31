@@ -47,7 +47,7 @@ async def read_todo(request: Request, todo_id):
   return templates.TemplateResponse("todo_get.html", {
         "request": request,
         "name": "Taito!",
-        "todo_list": todo.box
+        "todo": todo
         })
 
 #Todo 作成
@@ -71,7 +71,7 @@ def create_todo(
     db.commit()
     db.refresh(new_set)
     print(f"挿入したレコード: {new_record.id}, {new_record.box}, {new_record.date}, {new_record.completed}")
-    print(f"SETに挿入したレコード: {new_set.id}, {new_set.todo}, {new_set.tag}")
+    print(f"SETに挿入したレコード: {new_set.id}, {new_set.todo_id}, {new_set.tag_id}")
     # 追加後にリダイレクトして、最新のToDoリストを表示する
     return RedirectResponse(url="/todo", status_code=303)
 
