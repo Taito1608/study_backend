@@ -6,7 +6,8 @@
         <input type="text" id="todo-input" class="todo-input" placeholder="ToDoを入力" name="box" required>
         
         <!-- タグの選択 -->
-        <select id="tag-select" class="tag-select" name="tag_id">
+         
+        <select id="tag-select" class="tag-select" name="tag" multiple>
             {% for tag in tag_list %}
                 <option value="{{ tag.id }}">{{ tag.desc }}</option>
             {% endfor %}
@@ -50,5 +51,38 @@
     <button type="button" class="back-button" onclick="history.back()">
         戻る
     </button>
+
+    <style>
+
+    </style>
+
+    <script>
+        // Todoを削除する
+        async function deleteTodo(todoId) {
+            if (!confirm("本当に削除しますか？")) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/todo/${todoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    alert("ToDoを削除しました");
+                    location.reload();  // ページをリロードして最新のToDoリストを表示
+                } else {
+                    const data = await response.json();
+                    alert("削除に失敗しました: " + (data.message || "不明なエラー"));
+                }
+            } catch (error) {
+                console.error("エラー:", error);
+                alert("エラーが発生しました");
+            }
+        }
+    </script>
 
 {%- endblock %}

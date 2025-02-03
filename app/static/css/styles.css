@@ -26,11 +26,15 @@ h1 {
     text-shadow: 2px 2px 2px #888;
 }
 
-/* 入力エリアとボタンのスタイル */
-.input-container {
+/* フッター部分 */
+.footer {
     display: flex;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
 }
+
+
 
 input {
     flex: 1;
@@ -55,33 +59,6 @@ button:hover {
     background-color: #2980b9;
 }
 
-/* タスクリストのスタイル */
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    background: #f9f9f9;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-li.checked {
-    text-decoration: line-through;
-    color: #888;
-}
-
-/* チェックボックスのスタイル */
-li input[type="checkbox"] {
-    margin-right: 10px;
-}
-
 /* 削除ボタン */
 .remove-btn {
     background: none;
@@ -95,68 +72,6 @@ li input[type="checkbox"] {
     color: #c0392b;
 }
 
-/* フッター部分 */
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-}
-
-#taskStatus {
-    background: yellow;
-    padding: 5px;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-#removeCheckedBtn {
-    background: #2ecc71;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#removeCheckedBtn:hover {
-    background: #27ae60;
-}
-
-/*完了時の横線*/
-.completed {
-    text-decoration: line-through;
-    color: #000;
-}
-
-/* リストアイテムのデザイン */
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-
-li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8f8f8;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-/* タスク名を左寄せ、日付と状態を右寄せ */
-.task-content {
-    flex-grow: 1;
-    text-align: left;
-}
-
-.task-meta {
-    text-align: right;
-    min-width: 80px; /* 適宜調整 */
-    color: #165e83;
-}
 
 /* 戻るボタンのデザイン */
 .back-button {
@@ -268,41 +183,6 @@ td {
 }
 
 
-/* テーブルのスタイル */
-table {
-    width: 100%;
-    border-spacing: 0; /* セル間に隙間を作らない */
-}
-
-/* 偶数行の背景色 */
-#todo-list tr:nth-child(even) {
-    background-color: #f4f4f4; /* 例えば薄いグレー */
-}
-
-/* 奇数行の背景色 */
-#todo-list tr:nth-child(odd) {
-    background-color: #ffffff; /* 白 */
-}
-
-/* ホバー時に背景色を変更 */
-#todo-list tr:hover {
-    background-color: #e0e0e0; /* ホバー時の背景色 */
-}
-
-/* 行ごとに下線を引く */
-#todo-list tr {
-    border-bottom: 1px solid #ccc; /* 行の下に薄い灰色の線を引く */
-}
-
-/* 最後の行のボーダーを削除 */
-#todo-list tr:last-child {
-    border-bottom: none;
-}
-
-/* セル内の余白を追加 */
-td {
-    padding: 10px; /* セルの内側に余白を作成 */
-}
 
 /* タグ選択ボタンの設定 */
 .tag-button {
