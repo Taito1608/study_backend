@@ -24,7 +24,7 @@ async def read_tag(request: Request, tag_id: int):
         .all()
     )
 
-    return templates.TemplateResponse("tag_get.html", {
+    return templates.TemplateResponse("tag.html", {
         "request": request,
         "name": "Taito!",
         "tag": tag,
@@ -80,7 +80,7 @@ async def read_tags(request: Request):
     set_list = db.query(Set).all   
     db.close()
     
-    return templates.TemplateResponse("taglist_get.html", {
+    return templates.TemplateResponse("taglist.html", {
         "request": request,
         "name": "Taito!",
         "todo_list": todo_list,

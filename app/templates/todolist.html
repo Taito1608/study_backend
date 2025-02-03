@@ -46,7 +46,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <button onclick="deleteTodo('{{ item.todo.id }}')" class="add-button">
+                    <button onclick="deleteTodo('{{ item.todo.id }}')" class="remove-btn">
                         削除
                     </button>
                 </td>
@@ -61,7 +61,8 @@
         /* タグの設定 */
         .tag {
             display: inline-block;
-            background-color: #ddd;
+            background-color: #5ea8cf;
+            color: aliceblue;
             padding: 4px 8px;
             margin: 2px;
             border-radius: 4px;
@@ -102,6 +103,34 @@
                 alert("エラーが発生しました");
             }
         }
+
+    
+        document.getElementById("todo-form").addEventListener("submit", async function (event) {
+            event.preventDefault(); // フォームのデフォルト送信を防ぐ
+
+            if (!confirm("ToDo を追加しますか？")) {
+                return;
+            }
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch("/todo", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    alert("ToDo を追加しました");
+                    location.reload(); // ページをリロード
+                } else {
+                    alert("ToDo の追加に失敗しました");
+                }
+            } catch (error) {
+                console.error("エラー:", error);
+                alert("エラーが発生しました");
+            }
+        });
     </script>
 
 {%- endblock %}
