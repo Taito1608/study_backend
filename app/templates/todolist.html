@@ -6,7 +6,6 @@
         <input type="text" id="todo-input" class="todo-input" placeholder="ToDoを入力" name="box" required>
         
         <!-- タグの選択 -->
-         
         <select id="tag-select" class="tag-select" name="tag" multiple>
             {% for tag in tag_list %}
                 <option value="{{ tag.id }}">{{ tag.desc }}</option>
@@ -31,15 +30,23 @@
             {% for item in todo_list %}
             <tr>
                 <td>
-                    <a href="/todo/{{ item.id }}" style="color: black; text-decoration: none;">
-                        {{ item.box }}
+                    <a href="/todo/{{ item.todo.id }}" style="color: black; text-decoration: none;">
+                        {{ item.todo.box }}
                     </a>
                 </td>
-                <td>{{ item.date if item.date else 'なし' }}</td>
-                <td>{{ '完了' if item.completed else '未完了' }}</td>
-                <td></td>
+                <td>{{ item.todo.date if item.todo.date else 'なし' }}</td>
+                <td>{{ '完了' if item.todo.completed else '未完了' }}</td>
                 <td>
-                    <button onclick="deleteTodo('{{ item.id }}')" class="add-button">
+                    {% if item.set_tag_descs %}
+                        {% for tag_desc in item.set_tag_descs %}
+                            <span>{{ tag_desc }}</span>
+                        {% endfor %}
+                    {% else %}
+                        なし
+                    {% endif %}
+                </td>
+                <td>
+                    <button onclick="deleteTodo('{{ item.todo.id }}')" class="add-button">
                         削除
                     </button>
                 </td>
@@ -53,7 +60,7 @@
     </button>
 
     <style>
-
+        /* 任意のスタイル */
     </style>
 
     <script>

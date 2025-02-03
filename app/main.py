@@ -3,11 +3,9 @@ from fastapi.responses import HTMLResponse,RedirectResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
 from .database.setting import SessionLocal
 from .database.table.models import Todo, Tag, Set
 from typing import List
-from urllib.parse import urljoin
 from datetime import datetime
 
 app = FastAPI(
@@ -107,18 +105,37 @@ async def read_todo(request: Request, todo_id):
 #Todo 取得(一覧)
 @app.get("/todo")
 async def read_todolist(request: Request):
+    # タグとToDoのリストを取得
     tag_list = db.query(Tag).all()
-    todo_list = db.query(Todo).all()   
-    set_list = db.query(Set).all   
-    db.close()
+    todo_list = db.query(Todo).all()
+
+    # set_tagリストを各Todoに関連するTag.descを格納
+    todo_list_with_tags = []
+    for todo in todo_list:
+        # Todoに関連するTag.descを取得
+        set_tags = (
+            db.query(Tag.desc)
+            .join(Set, Set.tag_id == Tag.id)
+            .filter(Set.todo_id == todo.id)
+            .all()
+        )
+        tag_descs = [set_tag.desc for set_tag in set_tags]
+        
+        # 取得したTag.descをセット
+        todo_list_with_tags.append({
+            "todo": todo,
+            "set_tag_descs": tag_descs
+        })
     
+    db.close()
+
     return templates.TemplateResponse("todolist.html", {
         "request": request,
         "name": "Taito!",
-        "todo_list": todo_list,
+        "todo_list": todo_list_with_tags,
         "tag_list": tag_list,
-        "set_list": set_list
-        })
+    })
+
 
 #Todo 作成
 @app.post("/todo")
