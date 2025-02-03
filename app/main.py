@@ -6,6 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from .database.setting import SessionLocal
 from .database.table.models import Todo, Tag, Set
 from typing import List
+
 from datetime import datetime
 
 app = FastAPI(
@@ -63,7 +64,8 @@ async def update_todo(todo_id: int, request:Request):
     #それぞれのデータを取り出す
     todobox = data.get("todobox")    
     todocomp = data.get("todocomp")  
-    tag_id = data.get("tag_id") 
+    tag_ids = data.get("tag_ids", [])
+    #data.get("tag_id") 
 
     date_str = data.get("tododate")
     if date_str:
@@ -73,7 +75,15 @@ async def update_todo(todo_id: int, request:Request):
         tododate = None
 
     todo_update = db.query(Todo).filter(Todo.id == todo_id).first()
-    tag_update = db.query(Set).filter(Set.tag_id == tag_id).first()
+    #Tagの重複を避けるために現在のタグを削除
+    db.query(Set).filter(Set.todo_id == todo_id).delete()
+
+    #Tagの追加
+    if tag_ids:
+        for tag_set in tag_ids:
+            new_set = Set(todo_id=todo_update.id, tag_id=tag_set)
+            db.add(new_set)
+            print(f"関連付けられたタグ: {tag_set}")
 
     if not todo_update:
         return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
@@ -85,7 +95,7 @@ async def update_todo(todo_id: int, request:Request):
     db.commit()
 
     # 取り出したデータを表示
-    print(f"ToDo: {todobox}, 日付: {tododate}, 完了: {todocomp}, タグID: {tag_id}")
+    print(f"ToDo: {todobox}, 日付: {tododate}, 完了: {todocomp}")
     return JSONResponse(status_code=200, content={"message": "ToDoが更新されました"})
 
 #Todo 取得(個別)

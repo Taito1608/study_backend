@@ -29,9 +29,9 @@
             <strong>完了</strong>
         </label>
         
-        <select id="tag-select" class="tag-updateselect" name="tag_id">
+        <select id="tag-select" class="tag-updateselect" name="tag_id" multiple>
             {% for tag in tag_list %}
-                <option value="{{ tag.id }}" {% if tag.id == todo.tag_id %}selected{% endif %}>{{ tag.desc }}</option>
+                <option value="{{ tag.id }}">{{ tag.desc }}</option>
             {% endfor %}
         </select>
         
@@ -87,11 +87,13 @@
 
                 // フォームのデータを取得
                 const formData = new FormData(form);
+                const selectedTags = formData.getAll("tag_id"); // 複数のタグを配列として取得
+
                 const data = {
                     todobox: formData.get("todobox"),
                     tododate: formData.get("tododate"),
                     todocomp: !!formData.get("todocomp"), // チェックボックスを boolean に変換
-                    tag_id: formData.get("tag_id")
+                    tag_ids: selectedTags // ここを配列で送信
                 };
 
                 try {
