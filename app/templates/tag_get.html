@@ -1,36 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
 
+    <h3>Tag</h3>
+    <h2>{{ tag.desc }}</h2>
+
+    <h3>このタグが紐づいているToDo一覧:</h3>
     <ul>
-        {{ tag.desc }}
+        {% for todo in related_todos %}
+            <li>{{ todo.box }} （期限: {{ todo.date if todo.date else 'なし' }}）</li>
+        {% else %}
+            <li>このタグに紐づくToDoはありません。</li>
+        {% endfor %}
     </ul>
 
     <form id="tag-updateform" class="tag-updateform" data-tag-id="{{ tag.id }}">
         <input type="text" id="update-tagdesc" class="tag-updateinput" placeholder="Tagを入力" name="tagdesc" required value="{{ tag.desc }}">
-        
         <button type="submit" class="add-button">更新</button>
     </form>
 
     <a href="/tag" class="back-button">戻る</a>
-
-    <style>
-        /* Tag更新画面*/
-        .tag-updateform {
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* 各要素の間隔を調整 */
-            width: 100%;
-            max-width: 400px; /* フォームの最大幅を制限 */
-            margin: auto; /* 中央配置 */
-        }
-
-        .add-button {
-            width: 100%; /* 幅を揃える */
-            padding: 8px;
-            font-size: 16px;
-        }
-
-    </style>
 
     <script>
         // Tagの更新処理
@@ -41,16 +29,15 @@
                 return;
             }
 
-            const tagId = form.dataset.tagId; // HTML の data-tag-id から取得
+            const tagId = form.dataset.tagId;
 
             form.addEventListener("submit", async function (event) {
-                event.preventDefault(); // フォームの通常の送信を防ぐ
+                event.preventDefault();
                 
                 if (!confirm("本当に更新しますか？")) {
                     return;
                 }
 
-                // フォームのデータを取得
                 const formData = new FormData(form);
                 const data = {
                     tagdesc: formData.get("tagdesc"),
@@ -67,7 +54,7 @@
 
                     if (response.ok) {
                         alert("Tagを更新しました");
-                        location.reload(); // ページをリロード
+                        location.reload();
                     } else {
                         const responseData = await response.json();
                         alert("更新に失敗しました: " + (responseData.message || "不明なエラー"));

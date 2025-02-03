@@ -53,7 +53,6 @@ def delete_todo(todo_id: int):
     # Todo自体を削除
     db.delete(todo_item)
     db.commit()
-    
 
     return JSONResponse(status_code=200, content={"message": "ToDoが削除されました"})
 
@@ -98,6 +97,35 @@ async def update_todo(todo_id: int, request:Request):
     print(f"ToDo: {todobox}, 日付: {tododate}, 完了: {todocomp}")
     return JSONResponse(status_code=200, content={"message": "ToDoが更新されました"})
 
+#Todo 作成
+@app.post("/todo")
+async def create_todo(
+    box: str = Form(...), 
+    tag: List[int] = Form(...),  # 複数タグ対応
+):
+    print(f"ToDo: {box}, タグID: {tag}")
+    
+    # ToDo のレコード作成
+    new_record = Todo(box=box, completed=False)
+    db.add(new_record)
+    db.commit()
+    db.refresh(new_record)
+
+    # Setのレコード作成（複数のtag_idを登録）
+    if tag:  # tag_idが空でないことを確認
+        for tag_id in tag:
+            new_set = Set(todo_id=new_record.id, tag_id=tag_id)
+            db.add(new_set)
+            print(f"関連付けられたタグ: {tag_id}")
+
+        # コミットはループ外で一括して行う
+        db.commit()
+
+    print(f"挿入したToDoレコード: {new_record.id}, {new_record.box}, {new_record.completed}")
+    
+    # リダイレクトして最新のToDoリストを表示
+    return RedirectResponse(url="/todo", status_code=303)
+
 #Todo 取得(個別)
 @app.get("/todo/{todo_id}", response_class=HTMLResponse)
 async def read_todo(request: Request, todo_id: int):
@@ -117,7 +145,6 @@ async def read_todo(request: Request, todo_id: int):
         "tag_list": tag_list,  # 全タグ（選択肢）
         "todo_tags": todo_tags  # 紐づくタグ（表示用）
     })
-
 
 #Todo 取得(一覧)
 @app.get("/todo")
@@ -153,87 +180,23 @@ async def read_todolist(request: Request):
         "tag_list": tag_list,
     })
 
+#Tag 削除
+@app.delete("/tag/{tag_id}")
+def delete_tag(tag_id: int):
+    # 指定されたTagを取得
+    tag_item = db.query(Tag).filter(Tag.id == tag_id).first()
 
-#Todo 作成
-@app.post("/todo")
-async def create_todo(
-    box: str = Form(...), 
-    tag: List[int] = Form(...),  # 複数タグ対応
-):
-    print(f"ToDo: {box}, タグID: {tag}")
-    
-    # ToDo のレコード作成
-    new_record = Todo(box=box, completed=False)
-    db.add(new_record)
+    if not tag_item:
+        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
+
+    # 関連するSetテーブルのレコードを削除
+    db.query(Set).filter(Set.tag_id == tag_id).delete()
+
+    # Tag自体を削除
+    db.delete(tag_item)
     db.commit()
-    db.refresh(new_record)
 
-    # Setのレコード作成（複数のtag_idを登録）
-    if tag:  # tag_idが空でないことを確認
-        for tag_id in tag:
-            new_set = Set(todo_id=new_record.id, tag_id=tag_id)
-            db.add(new_set)
-            print(f"関連付けられたタグ: {tag_id}")
-
-        # コミットはループ外で一括して行う
-        db.commit()
-
-    print(f"挿入したToDoレコード: {new_record.id}, {new_record.box}, {new_record.completed}")
-    
-    # リダイレクトして最新のToDoリストを表示
-    return RedirectResponse(url="/todo", status_code=303)
-
-
-
-
-    
-
-#Tag 取得(一覧)
-@app.get("/tag")
-async def read_tags(request: Request):
-    tag_list = db.query(Tag).all()
-    todo_list = db.query(Todo).all()   
-    set_list = db.query(Set).all   
-    db.close()
-    
-    return templates.TemplateResponse("taglist_get.html", {
-        "request": request,
-        "name": "Taito!",
-        "todo_list": todo_list,
-        "tag_list": tag_list,
-        "set_list": set_list
-        })
-
-#Tag 取得(個別)
-@app.get("/tag/{tag_id}")
-async def read_tag(request: Request, tag_id):
-  tag = db.query(Tag).filter(Tag.id == tag_id).first()
-
-
-  return templates.TemplateResponse("tag_get.html", {
-        "request": request,
-        "name": "Taito!",
-        "tag": tag,
-        "tag_id": tag_id
-        })
-
-#Tag 作成
-@app.post("/tag")
-def create_tab(
-    box: str = Form(...), 
-):
-    
-    print(f"Tag: {box}")
-    
-    #tagのレコード作成
-    new_record = Tag(desc=box)
-    db.add(new_record)
-    db.commit()
-    db.refresh(new_record)
-
-    print(f"挿入したレコード: {new_record.id}, {new_record.desc}")
-    # 追加後にリダイレクトして、最新のTagリストを表示する
-    return RedirectResponse(url="/tag", status_code=303)
+    return JSONResponse(status_code=200, content={"message": "Tagが削除されました"})
 
 #Tag 更新
 @app.put("/tag/{tag_id}")
@@ -257,22 +220,60 @@ async def update_tag(tag_id: int, request: Request):
     
     return JSONResponse(status_code=200, content={"message": "Tagが更新されました"})
 
+#Tag 取得(個別)
+@app.get("/tag/{tag_id}")
+async def read_tag(request: Request, tag_id: int):
+    tag = db.query(Tag).filter(Tag.id == tag_id).first()
 
-#Tag 削除
-@app.delete("/tag/{tag_id}")
-def delete_tag(tag_id: int):
-    # 指定されたTagを取得
-    tag_item = db.query(Tag).filter(Tag.id == tag_id).first()
+    if not tag:
+        return JSONResponse(status_code=404, detail="Tagが見つかりません")
 
-    if not tag_item:
-        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
+    # Tagに紐づくTodoを取得（Setテーブルを使う）
+    related_todos = (
+        db.query(Todo)
+        .join(Set, Set.todo_id == Todo.id)
+        .filter(Set.tag_id == tag_id)
+        .all()
+    )
 
-    # 関連するSetテーブルのレコードを削除
-    db.query(Set).filter(Set.tag_id == tag_id).delete()
+    return templates.TemplateResponse("tag_get.html", {
+        "request": request,
+        "name": "Taito!",
+        "tag": tag,
+        "tag_id": tag_id,
+        "related_todos": related_todos  # 紐づくToDoリストを渡す
+    })
 
-    # Tag自体を削除
-    db.delete(tag_item)
+#Tag 取得(一覧)
+@app.get("/tag")
+async def read_tags(request: Request):
+    tag_list = db.query(Tag).all()
+    todo_list = db.query(Todo).all()   
+    set_list = db.query(Set).all   
+    db.close()
+    
+    return templates.TemplateResponse("taglist_get.html", {
+        "request": request,
+        "name": "Taito!",
+        "todo_list": todo_list,
+        "tag_list": tag_list,
+        "set_list": set_list
+        })
+
+#Tag 作成
+@app.post("/tag")
+def create_tab(
+    box: str = Form(...), 
+):
+    
+    print(f"Tag: {box}")
+    
+    #tagのレコード作成
+    new_record = Tag(desc=box)
+    db.add(new_record)
     db.commit()
+    db.refresh(new_record)
 
-    return JSONResponse(status_code=200, content={"message": "Tagが削除されました"})
-
+    print(f"挿入したレコード: {new_record.id}, {new_record.desc}")
+    # 追加後にリダイレクトして、最新のTagリストを表示する
+    return RedirectResponse(url="/tag", status_code=303)
