@@ -36,10 +36,10 @@
                 </td>
                 <td>{{ item.todo.date if item.todo.date else 'なし' }}</td>
                 <td>{{ '完了' if item.todo.completed else '未完了' }}</td>
-                <td>
+                <td class="listtags-column">
                     {% if item.set_tag_descs %}
                         {% for tag_desc in item.set_tag_descs %}
-                            <span>{{ tag_desc }}</span>
+                            <span class="tag">{{ tag_desc }}</span>
                         {% endfor %}
                     {% else %}
                         なし
@@ -58,7 +58,21 @@
     <a href="/" class="back-button">戻る</a>
 
     <style>
-        /* 任意のスタイル */
+        /* タグの設定 */
+        .tag {
+            display: inline-block;
+            background-color: #ddd;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        td.listtags-column {
+            max-width: 150px; /* 最大幅を設定 */
+            overflow: hidden;
+            text-overflow: ellipsis; /* 長すぎるテキストを省略（...にする） */
+            
+        }
     </style>
 
     <script>

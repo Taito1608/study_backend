@@ -16,7 +16,15 @@
                 <td>{{ todo.box }}</td>
                 <td>{{ todo.date if todo.date else 'なし' }}</td>
                 <td>{{ '完了' if todo.completed else '未完了' }}</td>
-                <td></td>
+                <td class="tags-column">
+                    {% if todo_tags %}
+                        {% for tag in todo_tags %}
+                            <span class="tag">{{ tag.desc }}</span>
+                        {% endfor %}
+                    {% else %}
+                        なし
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>
@@ -64,6 +72,20 @@
             display: flex;
             align-items: center;
             gap: 1px; /* チェックボックスとテキストの間隔 */
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: #ddd;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        /*タグの列の横幅の最大値を設定*/
+        td.tags-column {
+            max-width: 150px; /* 最大幅を設定 */
+            overflow: hidden;
         }
     </style>
 

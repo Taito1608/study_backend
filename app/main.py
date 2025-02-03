@@ -100,17 +100,24 @@ async def update_todo(todo_id: int, request:Request):
 
 #Todo 取得(個別)
 @app.get("/todo/{todo_id}", response_class=HTMLResponse)
-async def read_todo(request: Request, todo_id):
-  todo = db.query(Todo).filter(Todo.id == todo_id).first()
-  tag_list = db.query(Tag).all()
+async def read_todo(request: Request, todo_id: int):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if not todo:
+        return JSONResponse(status_code=404, detail="ToDoが見つかりません")
 
+    tag_list = db.query(Tag).all()  # 全タグリスト（選択用）
+    
+    # ToDo に紐づくタグを取得
+    todo_tags = db.query(Tag).join(Set).filter(Set.todo_id == todo_id).all()
 
-  return templates.TemplateResponse("todo.html", {
+    return templates.TemplateResponse("todo.html", {
         "request": request,
         "name": "Taito!",
         "todo": todo,
-        "tag_list": tag_list
-        })
+        "tag_list": tag_list,  # 全タグ（選択肢）
+        "todo_tags": todo_tags  # 紐づくタグ（表示用）
+    })
+
 
 #Todo 取得(一覧)
 @app.get("/todo")
