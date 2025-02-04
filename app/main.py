@@ -35,6 +35,14 @@ async def root_page(request: Request):
         "name": "Taito!",
         })
 
+# error画面
+@app.get("/error/{id}")
+async def error_page(request: Request, id: str):
+    return templates.TemplateResponse("error.html", {
+        "request": request,
+        "massage": id
+    })
+
 # ルート登録（ルーティング）
 app.include_router(todo.router)
 app.include_router(tag.router)

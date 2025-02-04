@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Query
 from fastapi.responses import RedirectResponse,JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.database.setting import SessionLocal
@@ -10,8 +10,16 @@ templates = Jinja2Templates(directory="app/templates")
 
 #Tag 取得(一覧)
 @router.get("/tag")
-async def read_tags(request: Request):
-    tag_list = db.query(Tag).all()
+async def read_tags(
+    request: Request,
+    skip: int = Query(0),
+    limit: int = Query(100)                   
+):
+    if limit <0 or skip < 0:
+        return RedirectResponse(url="/error/tag")
+
+    tag_query = db.query(Tag).offset(skip).limit(limit)
+    tag_list = tag_query.all()
     todo_list = db.query(Todo).all()   
     set_list = db.query(Set).all   
     db.close()

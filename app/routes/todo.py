@@ -14,10 +14,13 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("/todo")
 async def read_todolist(
     request: Request,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1),
-    completed: bool = Query(False),
+    skip: int = Query(0),
+    limit: int = Query(100),
+    completed: bool = Query(False)
 ):
+    if limit <0 or skip < 0:
+        return RedirectResponse(url="/error/todo")
+    
     # タグのリストを取得
     tag_list = db.query(Tag).all()
 
