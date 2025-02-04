@@ -1,17 +1,40 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    <h3>Tag</h3>
     <h2>{{ tag.desc }}</h2>
-
     <h3>このタグが紐づいているToDo一覧:</h3>
-    <ul>
-        {% for todo in related_todos %}
-            <li>{{ todo.box }} （期限: {{ todo.date if todo.date else 'なし' }}）</li>
-        {% else %}
-            <li>このタグに紐づくToDoはありません。</li>
-        {% endfor %}
-    </ul>
+
+    <table style="border-collapse: separate; border-spacing: 0;">
+        <thead>
+            <tr>
+                <th>内容</th>
+                <th>期限</th>
+                <th>完了</th>
+                <th>削除</th>
+            </tr>
+        </thead>
+        <tbody id="todo-list">
+
+            {% for todo in related_todos %}
+            <tr>
+                <td>
+                    <a href="/todo/{{ todo.id }}" style="color: black; text-decoration: none;">
+                        {{ todo.box }}
+                    </a>
+                </td>
+                <td>{{ todo.date if todo.date else 'なし' }}</td>
+                <td>{{ '完了' if todo.completed else '未完了' }}</td>
+                <td>
+                    <button onclick="deleteTodo('{{ todo.id }}')" class="remove-btn">
+                        削除
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
 
     <form id="tag-updateform" class="tag-updateform" data-tag-id="{{ tag.id }}">
         <input type="text" id="update-tagdesc" class="tag-updateinput" placeholder="Tagを入力" name="tagdesc" required value="{{ tag.desc }}">
@@ -65,6 +88,33 @@
                 }
             });
         });
+
+         // Todoを削除する(todolist)
+        async function deleteTodo(todoId) {
+            if (!confirm("本当に削除しますか？")) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/todo/${todoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    alert("ToDoを削除しました");
+                    location.reload();  // ページをリロードして最新のToDoリストを表示
+                } else {
+                    const data = await response.json();
+                    alert("削除に失敗しました: " + (data.message || "不明なエラー"));
+                }
+            } catch (error) {
+                console.error("エラー:", error);
+                alert("エラーが発生しました");
+            }
+        }
     </script>
 
 {% endblock %}
