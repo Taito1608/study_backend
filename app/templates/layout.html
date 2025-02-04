@@ -9,20 +9,7 @@
 </head>
 <body>
     <div class="background">
-        <!-- タイトルとメニューを適切に配置 -->
-        <div class="header">
-            <h1>TODOLIST</h1>  
-            <button id="menu-toggle" class="hamburger">&#9776;</button>
-        </div>
-
-        <nav id="menu" class="menu">
-            <ul>
-                <li><a href="/todo?completed=false">未完了リスト</a></li>
-                <li><a href="/todo?completed=true">完了済みリスト</a></li>
-                <li><a href="/tag">タグリスト</a></li>
-            </ul>
-        </nav>
-
+        <h1>TODOLIST</h1>  
         <div style="display: flex; flex-direction: column; min-height: 80vh">
             <div>
                 Hello! {{ name }}
@@ -30,6 +17,6 @@
         {%- block content %}{% endblock %}
         </div>
     </div>
-    <script src="app/static/js/script.js"></script>
+
 </body>
 </html>
