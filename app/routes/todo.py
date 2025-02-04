@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Query
 from fastapi.responses import HTMLResponse,RedirectResponse,JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.database.setting import SessionLocal
@@ -10,12 +10,20 @@ router = APIRouter()
 db = SessionLocal()
 templates = Jinja2Templates(directory="app/templates")
 
-#Todo 取得(一覧)
+# Todo 取得(一覧)
 @router.get("/todo")
-async def read_todolist(request: Request):
-    # タグとToDoのリストを取得
+async def read_todolist(
+    request: Request,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1),
+    completed: bool = Query(False),
+):
+    # タグのリストを取得
     tag_list = db.query(Tag).all()
-    todo_list = db.query(Todo).all()
+
+    # ToDoリストの取得（フィルタリングとページネーション適用）
+    todo_query = db.query(Todo).filter(Todo.completed == completed).offset(skip).limit(limit)
+    todo_list = todo_query.all()
 
     # set_tagリストを各Todoに関連するTag.descを格納
     todo_list_with_tags = []
@@ -28,14 +36,12 @@ async def read_todolist(request: Request):
             .all()
         )
         tag_descs = [set_tag.desc for set_tag in set_tags]
-        
+
         # 取得したTag.descをセット
         todo_list_with_tags.append({
             "todo": todo,
             "set_tag_descs": tag_descs
         })
-    
-    db.close()
 
     return templates.TemplateResponse("todolist.html", {
         "request": request,
