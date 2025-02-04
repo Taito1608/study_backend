@@ -19,7 +19,7 @@
                 <td class="tags-column">
                     {% if todo_tags %}
                         {% for tag in todo_tags %}
-                            <span class="tag">{{ tag.desc }}</span>
+                            <span class="tag_desc">{{ tag.desc }}</span>
                         {% endfor %}
                     {% else %}
                         なし
@@ -43,13 +43,19 @@
             {% endfor %}
         </select>
         
-        <button type="submit" class="add-button">更新</button>
+        <button type="submit" class="update-button">更新</button>
     </form>
 
     <a href="/todo" class="back-button">戻る</a>
 
     <style>
-        /* Todo更新画面*/
+        /*タグの列の横幅の最大値を設定(todo)*/
+        td.tags-column {
+            max-width: 150px; /* 最大幅を設定 */
+            overflow: hidden;
+        }
+
+        /* Todo更新画面(todo)*/
         .todo-updateform {
             display: flex;
             flex-direction: column;
@@ -62,7 +68,7 @@
         .todo-updateinput,
         #update-tododate,
         .tag-updateselect,
-        .add-button {
+        .update-button {
             width: 100%; /* 幅を揃える */
             padding: 8px;
             font-size: 16px;
@@ -73,25 +79,10 @@
             align-items: center;
             gap: 1px; /* チェックボックスとテキストの間隔 */
         }
-        
-        .tag {
-            display: inline-block;
-            background-color: #5ea8cf;
-            color: aliceblue;
-            padding: 4px 8px;
-            margin: 2px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        /*タグの列の横幅の最大値を設定*/
-        td.tags-column {
-            max-width: 150px; /* 最大幅を設定 */
-            overflow: hidden;
-        }
     </style>
 
     <script>
-        //Todoの更新
+        //Todoの更新(todo)
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("todo-updateform");
             if (!form) {

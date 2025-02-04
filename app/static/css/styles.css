@@ -200,3 +200,20 @@ td {
 .tag-button.selected {
     background-color: lightblue;
 }
+
+/* タグの設定（todolist） */
+.tag_desc {
+    display: inline-block;
+    background-color: #5ea8cf;
+    color: aliceblue;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+/*タグの列の横幅の最大値を設定(todolist)*/
+td.listtags-column {
+    max-width: 150px; /* 最大幅を設定 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 長すぎるテキストを省略（...にする） */
+}

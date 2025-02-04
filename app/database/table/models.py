@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from datetime import date
 
@@ -13,7 +13,7 @@ class Todo(Base):
 
     id   = Column('todo_id', Integer, primary_key=True, autoincrement=True)
     box  = Column('box', String(200), nullable=False)
-    date = Column('date', DateTime, nullable=True)  # 現在時刻をデフォルトに設定
+    date = Column('date', Date, nullable=True)  # 現在時刻をデフォルトに設定
     completed = Column('completed', Boolean, default=False)
     settings = relationship("Set", back_populates="todo", cascade="all, delete-orphan")
 

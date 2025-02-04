@@ -14,6 +14,8 @@
         
         <button type="submit" class="add-button">追加</button>
     </form>
+
+    <br>
     
     <!-- ToDo リスト -->
     <table style="border-collapse: separate; border-spacing: 0;">
@@ -39,7 +41,7 @@
                 <td class="listtags-column">
                     {% if item.set_tag_descs %}
                         {% for tag_desc in item.set_tag_descs %}
-                            <span class="tag">{{ tag_desc }}</span>
+                            <span class="tag_desc">{{ tag_desc }}</span>
                         {% endfor %}
                     {% else %}
                         なし
@@ -57,27 +59,8 @@
 
     <a href="/" class="back-button">戻る</a>
 
-    <style>
-        /* タグの設定 */
-        .tag {
-            display: inline-block;
-            background-color: #5ea8cf;
-            color: aliceblue;
-            padding: 4px 8px;
-            margin: 2px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        td.listtags-column {
-            max-width: 150px; /* 最大幅を設定 */
-            overflow: hidden;
-            text-overflow: ellipsis; /* 長すぎるテキストを省略（...にする） */
-            
-        }
-    </style>
-
     <script>
-        // Todoを削除する
+      // Todoを削除する(todolist)
         async function deleteTodo(todoId) {
             if (!confirm("本当に削除しますか？")) {
                 return;
@@ -104,7 +87,7 @@
             }
         }
 
-    
+        //Todoの追加時のアラート（todolist）
         document.getElementById("todo-form").addEventListener("submit", async function (event) {
             event.preventDefault(); // フォームのデフォルト送信を防ぐ
 
@@ -130,7 +113,9 @@
                 console.error("エラー:", error);
                 alert("エラーが発生しました");
             }
-        });
+        });  
     </script>
+
+   
 
 {%- endblock %}
