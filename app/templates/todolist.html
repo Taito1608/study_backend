@@ -2,16 +2,16 @@
 {%- block content %}
 
     <!-- Todo入力フォーム -->
-    <form id="todo-form" class="todo-form" method="POST" action="/todo">
+    <form id="todo-form" class="todo-form">
         <input type="text" id="todo-input" class="todo-input" placeholder="ToDoを入力" name="box" required>
-        
+    
         <!-- タグの選択 -->
         <select id="tag-select" class="tag-select" name="tag" multiple>
             {% for tag in tag_list %}
                 <option value="{{ tag.id }}">{{ tag.desc }}</option>
             {% endfor %}
         </select>
-        
+    
         <button type="submit" class="add-button">追加</button>
     </form>
 
@@ -87,33 +87,37 @@
             }
         }
 
-        //Todoの追加時のアラート（todolist）
-        document.getElementById("todo-form").addEventListener("submit", async function (event) {
-            event.preventDefault(); // フォームのデフォルト送信を防ぐ
+        document.getElementById("todo-form").addEventListener("submit", async function(event) {
+        event.preventDefault(); // フォームの通常の送信を防ぐ
 
-            if (!confirm("ToDo を追加しますか？")) {
+        if (!confirm("本当に追加しますか？")) {
                 return;
             }
 
-            const formData = new FormData(this);
+        const formData = new FormData(this);
 
-            try {
-                const response = await fetch("/todo", {
-                    method: "POST",
-                    body: formData,
-                });
+        // 複数のタグを配列として取得
+        const tags = Array.from(document.getElementById("tag-select").selectedOptions).map(option => option.value);
+        formData.delete("tag"); // 元のタグデータを削除
+        tags.forEach(tag => formData.append("tag", tag)); // 配列として追加
 
-                if (response.ok) {
-                    alert("ToDo を追加しました");
-                    location.reload(); // ページをリロード
-                } else {
-                    alert("ToDo の追加に失敗しました");
-                }
-            } catch (error) {
-                console.error("エラー:", error);
-                alert("エラーが発生しました");
+        try {
+            const response = await fetch("/todo", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("ToDoが追加されました！"); // 成功時のアラート
+                window.location.href = "/todo"; // 成功時にリダイレクト
+            } else {
+                alert("ToDoの追加に失敗しました。");
             }
-        });  
+        } catch (error) {
+            console.error("通信エラー:", error);
+            alert("エラーが発生しました。ネットワークを確認してください。");
+        }
+    });
     </script>
 
 {%- endblock %}

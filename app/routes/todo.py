@@ -77,10 +77,10 @@ async def read_todo(request: Request, todo_id: int):
 @router.post("/todo")
 async def create_todo(
     box: str = Form(...), 
-    tag: List[int] = Form(...),  # 複数タグ対応
+    tag: List[int] = Form([]), # 複数タグ対応（デフォルト空リスト）
 ):
     print(f"ToDo: {box}, タグID: {tag}")
-    
+
     # ToDo のレコード作成
     new_record = Todo(box=box, completed=False)
     db.add(new_record)
@@ -88,7 +88,7 @@ async def create_todo(
     db.refresh(new_record)
 
     # Setのレコード作成（複数のtag_idを登録）
-    if tag:  # tag_idが空でないことを確認
+    if tag: # tag_idが空でないことを確認
         for tag_id in tag:
             new_set = Set(todo_id=new_record.id, tag_id=tag_id)
             db.add(new_set)
@@ -99,8 +99,7 @@ async def create_todo(
 
     print(f"挿入したToDoレコード: {new_record.id}, {new_record.box}, {new_record.completed}")
     
-    # リダイレクトして最新のToDoリストを表示
-    return RedirectResponse(url="/todo", status_code=303)
+    return JSONResponse(content={"message": "ToDo追加成功", "todo_id": new_record.id})
 
 #Todo 更新
 @router.put("/todo/{todo_id}")
