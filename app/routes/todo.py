@@ -16,6 +16,32 @@ class TodoRequest(BaseModel):
     box: str
     tag: List[int] = []  # タグはリスト（デフォルトは空リスト）
 
+@router.get("/api/todos")
+async def get_todos(
+    skip: int = Query(0), 
+    limit: int = Query(100), 
+    completed: bool = Query(False)):
+    db = SessionLocal()
+
+    # ToDoリストを取得
+    todos = db.query(Todo).filter(Todo.completed == completed).offset(skip).limit(limit).all()
+
+    # ToDoごとのタグ情報を取得
+    todo_list = []
+    for todo in todos:
+        tags = db.query(Tag.desc).join(Set, Set.tag_id == Tag.id).filter(Set.todo_id == todo.id).all()
+        tag_descs = [tag.desc for tag in tags]
+
+        todo_list.append({
+            "id": todo.id,
+            "box": todo.box,
+            "date": todo.date.isoformat() if todo.date else None,
+            "completed": todo.completed,
+            "tags": tag_descs
+        })
+
+    return todo_list
+
 # Todo 取得(一覧)
 @router.get("/todo")
 async def read_todolist(
@@ -26,37 +52,10 @@ async def read_todolist(
 ):
     if limit <0 or skip < 0:
         return RedirectResponse(url="/error/todo")
-    
-    # タグのリストを取得
-    tag_list = db.query(Tag).all()
-
-    # ToDoリストの取得（フィルタリングとページネーション適用）
-    todo_query = db.query(Todo).filter(Todo.completed == completed).offset(skip).limit(limit)
-    todo_list = todo_query.all()
-
-    # set_tagリストを各Todoに関連するTag.descを格納
-    todo_list_with_tags = []
-    for todo in todo_list:
-        # Todoに関連するTag.descを取得
-        set_tags = (
-            db.query(Tag.desc)
-            .join(Set, Set.tag_id == Tag.id)
-            .filter(Set.todo_id == todo.id)
-            .all()
-        )
-        tag_descs = [set_tag.desc for set_tag in set_tags]
-
-        # 取得したTag.descをセット
-        todo_list_with_tags.append({
-            "todo": todo,
-            "set_tag_descs": tag_descs
-        })
 
     return templates.TemplateResponse("todolist.html", {
         "request": request,
         "name": "Taito!",
-        "todo_list": todo_list_with_tags,
-        "tag_list": tag_list,
     })
 
 #Todo 取得(個別)

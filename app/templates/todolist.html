@@ -29,38 +29,41 @@
             </tr>
         </thead>
         <tbody id="todo-list">
-            {% for item in todo_list %}
-            <tr>
-                <td>
-                    <a href="/todo/{{ item.todo.id }}" style="color: black; text-decoration: none;">
-                        {{ item.todo.box }}
-                    </a>
-                </td>
-                <td>{{ item.todo.date if item.todo.date else 'なし' }}</td>
-                <td>{{ '完了' if item.todo.completed else '未完了' }}</td>
-                <td class="listtags-column">
-                    {% if item.set_tag_descs %}
-                        {% for tag_desc in item.set_tag_descs %}
-                            <span class="tag_desc">{{ tag_desc }}</span>
-                        {% endfor %}
-                    {% else %}
-                        なし
-                    {% endif %}
-                </td>
-                <td>
-                    <button onclick="deleteTodo('{{ item.todo.id }}')" class="remove-btn">
-                        削除
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
+            <!-- JavaScript で埋め込む -->
         </tbody>
     </table>
 
     <a href="/" class="back-button">戻る</a>
 
     <script>
-      // Todoを削除する(todolist)
+        // ToDo一覧を取得＆描画する関数
+        async function loadTodos() {
+            const response = await fetch("/api/todos");  // APIからデータ取得
+            const data = await response.json();
+            
+            const todoList = document.getElementById("todo-list");
+            todoList.innerHTML = "";  // 既存のリストをクリア
+
+            data.forEach(todo => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>
+                        <a href="/todo/${todo.id}" style="color: black; text-decoration: none;">
+                            ${todo.box}
+                        </a>
+                    </td>
+                    <td>${todo.date ? todo.date : "なし"}</td>
+                    <td>${todo.completed ? "完了" : "未完了"}</td>
+                    <td>${todo.tags.length > 0 ? todo.tags.join(", ") : "なし"}</td>
+                    <td>
+                        <button onclick="deleteTodo(${todo.id})" class="remove-btn">削除</button>
+                    </td>
+                `;
+                todoList.appendChild(row);
+            });
+        }
+
+        // Todoを削除する
         async function deleteTodo(todoId) {
             if (!confirm("本当に削除しますか？")) {
                 return;
@@ -69,17 +72,14 @@
             try {
                 const response = await fetch(`/todo/${todoId}`, {
                     method: 'DELETE',
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "Content-Type": "application/json" }
                 });
 
                 if (response.ok) {
                     alert("ToDoを削除しました");
-                    location.reload();  // ページをリロードして最新のToDoリストを表示
+                    loadTodos();  // ToDoリストを更新
                 } else {
-                    const data = await response.json();
-                    alert("削除に失敗しました: " + (data.message || "不明なエラー"));
+                    alert("削除に失敗しました");
                 }
             } catch (error) {
                 console.error("エラー:", error);
@@ -87,49 +87,40 @@
             }
         }
 
+        // ToDo追加処理
         document.getElementById("todo-form").addEventListener("submit", async function(event) {
-        event.preventDefault(); // フォームの通常の送信を防ぐ
+            event.preventDefault();  // デフォルトのフォーム送信を防ぐ
 
-        if (!confirm("本当に追加しますか？")) {
+            if (!confirm("本当に追加しますか？")) {
                 return;
             }
 
-        const todoData = {
-            box: document.getElementById("todo-input").value,
-            tag: Array.from(document.getElementById("tag-select").selectedOptions).map(option => parseInt(option.value))
-        };
+            const todoData = {
+                box: document.getElementById("todo-input").value,
+                tag: Array.from(document.getElementById("tag-select").selectedOptions).map(option => parseInt(option.value))
+            };
 
-        const response = await fetch("/todo", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(todoData)
+            try {
+                const response = await fetch("/todo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(todoData)
+                });
+
+                if (response.ok) {
+                    alert("ToDoが追加されました！");
+                    loadTodos();  // リストを更新
+                } else {
+                    alert("ToDoの追加に失敗しました。");
+                }
+            } catch (error) {
+                console.error("通信エラー:", error);
+                alert("エラーが発生しました。ネットワークを確認してください。");
+            }
         });
 
-
-        // 複数のタグを配列として取得
-        const tags = Array.from(document.getElementById("tag-select").selectedOptions).map(option => option.value);
-        formData.delete("tag"); // 元のタグデータを削除
-        tags.forEach(tag => formData.append("tag", tag)); // 配列として追加
-
-        try {
-            const response = await fetch("/todo", {
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                alert("ToDoが追加されました！"); // 成功時のアラート
-                window.location.href = "/todo"; // 成功時にリダイレクト
-            } else {
-                alert("ToDoの追加に失敗しました。");
-            }
-        } catch (error) {
-            console.error("通信エラー:", error);
-            alert("エラーが発生しました。ネットワークを確認してください。");
-        }
-    });
+        // 初回ロード時にToDoリストを取得
+        loadTodos();
     </script>
 
 {%- endblock %}
