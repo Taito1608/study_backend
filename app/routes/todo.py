@@ -53,9 +53,13 @@ async def read_todolist(
     if limit <0 or skip < 0:
         return RedirectResponse(url="/error/todo")
 
+    # タグのリストを取得
+    tag_list = db.query(Tag).all()
+
     return templates.TemplateResponse("todolist.html", {
         "request": request,
         "name": "Taito!",
+        "tag_list": tag_list,
     })
 
 #Todo 取得(個別)
