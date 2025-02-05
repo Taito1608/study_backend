@@ -94,7 +94,19 @@
                 return;
             }
 
-        const formData = new FormData(this);
+        const todoData = {
+            box: document.getElementById("todo-input").value,
+            tag: Array.from(document.getElementById("tag-select").selectedOptions).map(option => parseInt(option.value))
+        };
+
+        const response = await fetch("/todo", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(todoData)
+        });
+
 
         // 複数のタグを配列として取得
         const tags = Array.from(document.getElementById("tag-select").selectedOptions).map(option => option.value);
