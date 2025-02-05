@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, Query
+from fastapi import APIRouter, Request,Query
 from fastapi.responses import HTMLResponse,RedirectResponse,JSONResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -64,7 +64,7 @@ async def read_todolist(
 async def read_todo(request: Request, todo_id: int):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
-        return JSONResponse(status_code=404, detail="ToDoが見つかりません")
+        return RedirectResponse(url="/error/todo")
 
     tag_list = db.query(Tag).all()  # 全タグリスト（選択用）
     
@@ -134,7 +134,7 @@ async def update_todo(todo_id: int, request:Request):
             print(f"関連付けられたタグ: {tag_set}")
 
     if not todo_update:
-        return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
+        return RedirectResponse(url="/error/todo")
     
     todo_update.box = todobox
     todo_update.date = tododate
@@ -153,7 +153,7 @@ def delete_todo(todo_id: int):
     todo_item = db.query(Todo).filter(Todo.id == todo_id).first()
     
     if not todo_item:
-        return JSONResponse(status_code=404, content={"message": "ToDoが見つかりません"})
+        return RedirectResponse(url="/error/todo")
 
     # 関連するSetテーブルのレコードを削除
     db.query(Set).filter(Set.todo_id == todo_id).delete()

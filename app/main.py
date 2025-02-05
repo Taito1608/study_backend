@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse,RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -42,6 +42,11 @@ async def error_page(request: Request, id: str):
         "request": request,
         "massage": id
     })
+
+# 404エラーのリダイレクト設定
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    return RedirectResponse(url="/error")
 
 # ルート登録（ルーティング）
 app.include_router(todo.router)

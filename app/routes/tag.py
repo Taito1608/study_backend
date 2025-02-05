@@ -47,7 +47,7 @@ async def read_tag(request: Request, tag_id: int):
     tag = db.query(Tag).filter(Tag.id == tag_id).first()
 
     if not tag:
-        return JSONResponse(status_code=404, detail="Tagが見つかりません")
+        return RedirectResponse(url="/error/tag")
 
     # Tagに紐づくTodoを取得（Setテーブルを使う）
     related_todos = (
@@ -88,7 +88,7 @@ async def update_tag(tag_id: int, tag_data: TagUpdateRequest):
     tag_update = db.query(Tag).filter(Tag.id == tag_id).first()
 
     if not tag_update:
-        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
+        return RedirectResponse(url="/error/tag")
     
     # tagdescを更新
     tag_update.desc = tag_data.tagdesc
@@ -105,7 +105,7 @@ def delete_tag(tag_id: int):
     tag_item = db.query(Tag).filter(Tag.id == tag_id).first()
 
     if not tag_item:
-        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
+        return RedirectResponse(url="/error/tag")
 
     # 関連するSetテーブルのレコードを削除
     db.query(Set).filter(Set.tag_id == tag_id).delete()
@@ -127,7 +127,7 @@ async def update_tag(tag_id: int, request: Request):
     tag_update = db.query(Tag).filter(Tag.id == tag_id).first()
 
     if not tag_update:
-        return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
+        return RedirectResponse(url="/error/tag")
     
     # tagdescを更新
     tag_update.desc = tagdesc
