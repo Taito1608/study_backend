@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Form, Query
 from fastapi.responses import HTMLResponse,RedirectResponse,JSONResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from app.database.setting import SessionLocal
 from app.database.table.models import Todo, Tag, Set
 from typing import List
@@ -9,6 +10,11 @@ from datetime import datetime
 router = APIRouter()
 db = SessionLocal()
 templates = Jinja2Templates(directory="app/templates")
+
+# JSON形式のリクエストボディ用のPydanticモデル
+class TodoRequest(BaseModel):
+    box: str
+    tag: List[int] = []  # タグはリスト（デフォルトは空リスト）
 
 # Todo 取得(一覧)
 @router.get("/todo")
@@ -76,25 +82,23 @@ async def read_todo(request: Request, todo_id: int):
 #Todo 作成
 @router.post("/todo")
 async def create_todo(
-    box: str = Form(...), 
-    tag: List[int] = Form([]), # 複数タグ対応（デフォルト空リスト）
+    todo_data: TodoRequest
 ):
-    print(f"ToDo: {box}, タグID: {tag}")
+    print(f"ToDo: {todo_data.box}, タグID: {todo_data.tag}")
 
     # ToDo のレコード作成
-    new_record = Todo(box=box, completed=False)
+    new_record = Todo(box=todo_data.box, completed=False)
     db.add(new_record)
     db.commit()
     db.refresh(new_record)
 
     # Setのレコード作成（複数のtag_idを登録）
-    if tag: # tag_idが空でないことを確認
-        for tag_id in tag:
+    if todo_data.tag:
+        for tag_id in todo_data.tag:
             new_set = Set(todo_id=new_record.id, tag_id=tag_id)
             db.add(new_set)
             print(f"関連付けられたタグ: {tag_id}")
 
-        # コミットはループ外で一括して行う
         db.commit()
 
     print(f"挿入したToDoレコード: {new_record.id}, {new_record.box}, {new_record.completed}")

@@ -32,17 +32,18 @@
     <form id="todo-updateform" class="todo-updateform" data-todo-id="{{ todo.id }}">
         <input type="text" id="update-todobox" class="todo-updateinput" placeholder="ToDoを入力" name="todobox" required value="{{ todo.box }}">
         <input type="date" id="update-tododate" name="tododate" required value="{{ todo.date }}">
+        
         <label>
             <input type="checkbox" id="update-todocompleted" name="todocomp" value="True" {% if todo.completed %}checked{% endif %}>
             <strong>完了</strong>
         </label>
-        
+    
         <select id="tag-select" class="tag-updateselect" name="tag_id" multiple>
             {% for tag in tag_list %}
-                <option value="{{ tag.id }}">{{ tag.desc }}</option>
+                <option value="{{ tag.id }}" {% if tag.id in todo_tag_ids %}selected{% endif %}>{{ tag.desc }}</option>
             {% endfor %}
         </select>
-        
+    
         <button type="submit" class="update-button">更新</button>
     </form>
 
@@ -84,54 +85,59 @@
     <script>
         //Todoの更新(todo)
         document.addEventListener("DOMContentLoaded", function () {
-            const form = document.getElementById("todo-updateform");
-            if (!form) {
-                console.error("フォームが見つかりません");
+        const form = document.getElementById("todo-updateform");
+
+        if (!form) {
+            console.error("フォームが見つかりません");
+            return;
+        }
+
+        const todoId = form.dataset.todoId; // HTML の data-todo-id から取得
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            if (!confirm("本当に更新しますか？")) {
                 return;
             }
 
-            const todoId = form.dataset.todoId; // HTML の data-todo-id から取得
+            // フォームのデータを取得
+            const todobox = document.getElementById("update-todobox").value;
+            const tododate = document.getElementById("update-tododate").value;
+            const todocomp = document.getElementById("update-todocompleted").checked; // チェックボックスの状態をbooleanに変換
 
-            form.addEventListener("submit", async function (event) {
-                event.preventDefault(); // フォームの通常の送信を防ぐ
-                
-                if (!confirm("本当に更新しますか？")) {
-                    return;
+            // 複数タグの取得
+            const selectedTags = Array.from(document.getElementById("tag-select").selectedOptions).map(option => option.value);
+
+            const data = {
+                todobox: todobox,
+                tododate: tododate,
+                todocomp: todocomp,
+                tag_ids: selectedTags
+            };
+
+            try {
+                const response = await fetch(`/todo/${todoId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert("ToDoを更新しました");
+                    location.reload();
+                } else {
+                    const responseData = await response.json();
+                    alert("更新に失敗しました: " + (responseData.message || "不明なエラー"));
                 }
-
-                // フォームのデータを取得
-                const formData = new FormData(form);
-                const selectedTags = formData.getAll("tag_id"); // 複数のタグを配列として取得
-
-                const data = {
-                    todobox: formData.get("todobox"),
-                    tododate: formData.get("tododate"),
-                    todocomp: !!formData.get("todocomp"), // チェックボックスを boolean に変換
-                    tag_ids: selectedTags // ここを配列で送信
-                };
-
-                try {
-                    const response = await fetch(`/todo/${todoId}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    });
-
-                    if (response.ok) {
-                        alert("ToDoを更新しました");
-                        location.reload(); // ページをリロード
-                    } else {
-                        const responseData = await response.json();
-                        alert("更新に失敗しました: " + (responseData.message || "不明なエラー"));
-                    }
-                } catch (error) {
-                    console.error("エラー:", error);
-                    alert("エラーが発生しました");
-                }
-            });
+            } catch (error) {
+                console.error("エラー:", error);
+                alert("エラーが発生しました");
+            }
         });
+    });
     </script>
 
 {% endblock %}

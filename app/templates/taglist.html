@@ -1,13 +1,14 @@
 {%- extends "layout.html" %}
 {%- block content %}
     <!-- Tag入力フォーム -->
-    <form id="tag-form" class="tag-form" method="POST" action="/tag">
-        <input type="text" id="todo-input" class="tag-input" placeholder="Tagを入力" name="box" required>
+    <form id="tag-form" class="tag-form">
+        <input type="text" id="tag-input" class="tag-input" placeholder="Tagを入力" name="box" required>
         <button type="submit" class="add-button">追加</button>
     </form>
+
     <br>
 
-<!-- Tag リスト -->
+    <!-- Tag リスト -->
     <table style="border-collapse: separate; border-spacing: 0;">
         <thead>
             <tr>
@@ -15,7 +16,7 @@
                 <th>削除</th>
             </tr>
         </thead>
-        <tbody id="todo-list">
+        <tbody id="tag-list">
             {% for item in tag_list %}
             <tr>
                 <td>
@@ -43,27 +44,27 @@
         }
     
         /* 偶数行の背景色 */
-        #todo-list tr:nth-child(even) {
+        #tag-list tr:nth-child(even) {
             background-color: #f4f4f4; /* 例えば薄いグレー */
         }
     
         /* 奇数行の背景色 */
-        #todo-list tr:nth-child(odd) {
+        #tag-list tr:nth-child(odd) {
             background-color: #ffffff; /* 白 */
         }
     
         /* ホバー時に背景色を変更 */
-        #todo-list tr:hover {
+        #tag-list tr:hover {
             background-color: #e0e0e0; /* ホバー時の背景色 */
         }
     
         /* 行ごとに下線を引く */
-        #todo-list tr {
+        #tag-list tr {
             border-bottom: 1px solid #ccc; /* 行の下に薄い灰色の線を引く */
         }
     
         /* 最後の行のボーダーを削除 */
-        #todo-list tr:last-child {
+        #tag-list tr:last-child {
             border-bottom: none;
         }
     
@@ -74,31 +75,62 @@
     </style>
 
     <script>
-        async function deleteTag(tagId) {
-            if (!confirm("本当に削除しますか？")) {
-                return;
-            }
-    
-            try {
-                const response = await fetch(`/tag/${tagId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-    
-                if (response.ok) {
-                    alert("Tagを削除しました");
-                    location.reload();  // ページをリロードして最新のToDoリストを表示
-                } else {
-                    const data = await response.json();
-                    alert("削除に失敗しました: " + (data.message || "不明なエラー"));
-                }
-            } catch (error) {
-                console.error("エラー:", error);
-                alert("エラーが発生しました");
-            }
+        document.getElementById("tag-form").addEventListener("submit", async function(event) {
+        event.preventDefault(); // フォームの通常の送信を防ぐ
+
+        if (!confirm("本当に追加しますか？")) {
+            return;
         }
+
+        const box = document.getElementById("tag-input").value;
+        const tagData = JSON.stringify({ box: box });
+
+        try {
+            const response = await fetch("/tag", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: tagData
+            });
+
+            if (response.ok) {
+                alert("Tagが追加されました！"); // 成功時のアラート
+                window.location.href = "/tag"; // 成功時にリダイレクト
+            } else {
+                alert("Tagの追加に失敗しました。");
+            }
+        } catch (error) {
+            console.error("通信エラー:", error);
+            alert("エラーが発生しました。ネットワークを確認してください。");
+        }
+    });
+
+    async function deleteTag(tagId) {
+        if (!confirm("本当に削除しますか？")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/tag/${tagId}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                alert("Tagを削除しました");
+                location.reload();  // ページをリロードして最新のTagリストを表示
+            } else {
+                const data = await response.json();
+                alert("削除に失敗しました: " + (data.message || "不明なエラー"));
+            }
+        } catch (error) {
+            console.error("エラー:", error);
+            alert("エラーが発生しました");
+        }
+    }
     </script>
 
 {%- endblock %}

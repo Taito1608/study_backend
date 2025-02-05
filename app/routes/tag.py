@@ -1,12 +1,21 @@
 from fastapi import APIRouter, Request, Form, Query
 from fastapi.responses import RedirectResponse,JSONResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from app.database.setting import SessionLocal
 from app.database.table.models import Todo, Tag, Set
 
 router = APIRouter()
 db = SessionLocal()
 templates = Jinja2Templates(directory="app/templates")
+
+# JSONリクエスト用のPydanticモデル
+class TagRequest(BaseModel):
+    box: str
+
+class TagUpdateRequest(BaseModel):
+    tagdesc: str
+
 
 #Tag 取得(一覧)
 @router.get("/tag")
@@ -56,43 +65,36 @@ async def read_tag(request: Request, tag_id: int):
         "related_todos": related_todos  # 紐づくToDoリストを渡す
     })
 
-#Tag 作成
+# Tag 作成 (POST)
 @router.post("/tag")
-def create_tab(
-    box: str = Form(...), 
+async def create_tag(
+    tag_data: TagRequest
 ):
-    
-    print(f"Tag: {box}")
-    
-    #tagのレコード作成
-    new_record = Tag(desc=box)
+    print(f"Tag: {tag_data.box}")
+
+    # Tagのレコード作成
+    new_record = Tag(desc=tag_data.box)
     db.add(new_record)
     db.commit()
     db.refresh(new_record)
 
     print(f"挿入したレコード: {new_record.id}, {new_record.desc}")
-    # 追加後にリダイレクトして、最新のTagリストを表示する
-    return RedirectResponse(url="/tag", status_code=303)
+    
+    return JSONResponse(content={"message": "Tag追加成功", "tag_id": new_record.id})
 
-#Tag 更新
+# Tag 更新 (PUT)
 @router.put("/tag/{tag_id}")
-async def update_tag(tag_id: int, request: Request):
-    # JSONで送信されたデータを取得
-    data = await request.json()
-    tagdesc = data.get("tagdesc")  # 送信されたtagdescを取得
-
-    # tag_idに対応するTagをデータベースから取得
+async def update_tag(tag_id: int, tag_data: TagUpdateRequest):
     tag_update = db.query(Tag).filter(Tag.id == tag_id).first()
 
     if not tag_update:
         return JSONResponse(status_code=404, content={"message": "Tagが見つかりません"})
     
     # tagdescを更新
-    tag_update.desc = tagdesc
-    db.commit()  # データベースに変更を反映
+    tag_update.desc = tag_data.tagdesc
+    db.commit()
 
-    # 更新されたtagdescを表示
-    print(f"Tag updated to: {tagdesc}")
+    print(f"更新したレコード: {tag_data.tagdesc}")
     
     return JSONResponse(status_code=200, content={"message": "Tagが更新されました"})
 
